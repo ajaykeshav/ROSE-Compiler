@@ -113,33 +113,40 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_2 = C_tests C89_std_c89_tests \
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_3 = C_tests C89_std_c89_tests \
 @ROSE_USE_CLANG_FRONTEND_TRUE@	C_subset_of_Cxx_tests CudaTests \
 @ROSE_USE_CLANG_FRONTEND_TRUE@	OpenClTests
 # TOO (2/16/2011): Errors with Tensilica's Xtensa compilers as alternative backend compilers. We can
 # gradually enable these tests at a later stage if necessary.
 # DQ (2/18/2017): We can't use the EDG 4.9 frontend with later versions of compiler because it can't parse a few of the header files from those compilers.
 # LLVM header files are actually a copy of the GNU header files (e.g. LLVM 3.5 uses GNU 4.9 headers).
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_3 = C_tests Cxx_tests C_subset_of_Cxx_tests C99_tests C11_tests Cxx03_tests Cxx11_tests Cxx14_tests UPC_tests MicrosoftWindows_C_tests MicrosoftWindows_Cxx_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_4 = C_tests Cxx_tests C_subset_of_Cxx_tests C99_tests C11_tests Cxx03_tests Cxx11_tests Cxx14_tests UPC_tests MicrosoftWindows_C_tests MicrosoftWindows_Cxx_tests
 
 # DQ (1/1/2019): Only EDG 5.0 is has sufficent support for C++17 (I think).
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_5_0_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_4 = Cxx17_tests
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_FRONTEND_COMPILER_DEFAULT_IS_CXX11_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_5_0_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_5 = unparse_template_from_ast
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_5_0_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_5 = Cxx17_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_FRONTEND_COMPILER_DEFAULT_IS_CXX11_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_5_0_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_6 = unparse_template_from_ast
 
 # DQ (7/20/2020): Only EDG 6.0 is has sufficent support for C++20 (I think).
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_6_0_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_6 = Cxx20_tests
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_FRONTEND_COMPILER_DEFAULT_IS_CXX11_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_6_0_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_7 = unparse_template_from_ast
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_6_0_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_7 = Cxx20_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_FRONTEND_COMPILER_DEFAULT_IS_CXX11_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_EDG_VERSION_6_0_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_8 = unparse_template_from_ast
 
 # DQ (7/28/2014): Moved to after the C and C++ langauge tests.
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_8 = x10_tests
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_9 = x10_tests
 
 # DQ (7/25/2010): These should not be at the end, but it is easier to split out Fortran support this way.
 # DQ (7/14/2013): Temporarily commented out this test to evaluate progress on tests/nonsmoke/functional/CompileTests directory.
 #  SUBDIRS += Fortran_tests CAF2_tests
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_9 = Fortran_tests
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_10 = Fortran_tests
 #Pei-Hung (7/13/2015): Adding mixlanguage tests (patches from Stephen Guzik)
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_10 = mixLanguage_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_11 = mixLanguage_tests
 
 # Liao 2/130/2017: moved to after Fortran tests. So OpenMP's Fortran tests will be tested after Fortran_tests
 # DQ (1/15/2017): Added conditional support to avoid these tests when ROSE is configured for binary only support, failing in ROSE matrix testing).
@@ -149,17 +156,17 @@ host_triplet = @host@
 # if !USING_CLANG_COMPILER
 # SUBDIRS += OpenMP_tests FailSafe_tests
 # endif
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_GNU_COMPILER_TRUE@am__append_11 = OpenMP_tests OpenACC_tests FailSafe_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_GNU_COMPILER_TRUE@am__append_12 = OpenMP_tests OpenACC_tests FailSafe_tests
 # Exclude this list of files in the case of CLANG compiler.
 # Exclude this list of files in the case of Intel compiler.
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GNU_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@am__append_12 = OpenMP_tests OpenACC_tests FailSafe_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GNU_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@am__append_13 = OpenMP_tests OpenACC_tests FailSafe_tests
 # This is an unknown compiler.
 
 #Switch Java_tests to seperate run due to issues with large number of processors
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_JAVA_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_13 = MicrosoftWindows_Java_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_JAVA_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_14 = MicrosoftWindows_Java_tests
 
 # DQ (10/19/2010): Moved basic languge test to the front of the list.
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_14 = \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_15 = \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@      copyAST_tests PythonExample_tests \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@      colorAST_tests unparseToString_tests \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@      sourcePosition_tests \
@@ -174,11 +181,11 @@ host_triplet = @host@
 # Need to work work with Markus to understand the results better, skip these tests for now is using
 # Address Sanitizer.
 # DQ (7/2/2020): GNU 6.1 and later will fail for these tests.
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_15 = STL_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_16 = STL_tests
 
 # TOO (2/16/2011): Errors with Tensilica's Xtensa compilers as alternative backend compilers. We can
 # gradually enable these tests at a later stage if necessary.
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_16 = mergeAST_tests ElsaTestCases A++Tests staticCFG_tests 
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_17 = mergeAST_tests ElsaTestCases A++Tests staticCFG_tests 
 
 # DQ (11/5/2016): The Fortran tests in this directory fail (issues with JVM and too much parallelisn 
 # (-j24) which running with address sanitizer).  It is likely that we can skip only the Fortran
@@ -187,38 +194,38 @@ host_triplet = @host@
 # DQ (11/5/2016): Moved this to the end so that we can evaluate other testing results before this one.
 # Also skip these tests when using the address sanitizer since they would take SO LONG (at least for 
 # initial testing, I think).
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_17 = virtualCFG_tests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@am__append_18 = virtualCFG_tests \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_SANITIZER_FALSE@	RoseExample_tests
 
 # end of !ROSE_USE_CLANG_FRONTEND
-@ROSE_BUILD_PYTHON_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_18 = Python_tests
+@ROSE_BUILD_PYTHON_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_19 = Python_tests
 
 # DQ (1/15/2017): Added conditional support to avoid these tests when ROSE is configured for binary only support, failing in ROSE matrix testing).
 
 # Used to check all C and C++ test codes: not really specific to EDG 4.x
 
 # DQ (2/15/2014): Adding systemc tests (part of general C++ robustness tests)
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_19 = CudaTests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_20 = CudaTests \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@	frontend_integration \
 @ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@	systemc_tests
 
 # DQ (5/21/2017): Adding VX Works support.
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_VXWORKS_TRUE@am__append_20 = vxworks_tests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@@ROSE_USE_VXWORKS_TRUE@am__append_21 = vxworks_tests
 
 # DQ (8/23/2017): Adding support for testing experimental Charp support.
-@ROSE_EXPERIMENTAL_CSHARP_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_21 = experimental_csharp_tests
+@ROSE_EXPERIMENTAL_CSHARP_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_22 = experimental_csharp_tests
 
 # DQ (8/23/2017): Adding support for testing experimental Ada support.
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_22 = experimental_ada_tests
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_23 = experimental_ada_tests
 
 # DQ (8/23/2017): Adding support for testing experimental Jovial support.
-@ROSE_EXPERIMENTAL_JOVIAL_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_23 = experimental_jovial_tests
+@ROSE_EXPERIMENTAL_JOVIAL_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_24 = experimental_jovial_tests
 
 # DQ (8/23/2017): Adding support for testing experimental Cobol support.
-@ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_24 = experimental_cobol_tests
+@ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_25 = experimental_cobol_tests
 
 # Rasmussen (11/4/2017): Adding support for testing experimental Matlab support.
-@ROSE_EXPERIMENTAL_MATLAB_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_25 = experimental_matlab_tests
+@ROSE_EXPERIMENTAL_MATLAB_ROSE_CONNECTION_TRUE@@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_26 = experimental_matlab_tests
 subdir = tests/nonsmoke/functional/CompileTests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -996,10 +1003,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1107,8 +1114,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1390,9 +1398,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1427,27 +1439,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1513,14 +1514,14 @@ RTH_STATS = $(top_srcdir)/scripts/rth_stats.pl
 
 # DQ (7/28/2014): Moved this to aver the C and C++ language tests.
 # SUBDIRS = x10_tests
-SUBDIRS = $(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12) $(am__append_13) \
-	$(am__append_14) $(am__append_15) $(am__append_16) \
-	$(am__append_17) $(am__append_18) $(am__append_19) \
-	$(am__append_20) $(am__append_21) $(am__append_22) \
-	$(am__append_23) $(am__append_24) $(am__append_25)
+SUBDIRS = $(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13) $(am__append_14) \
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21) $(am__append_22) $(am__append_23) \
+	$(am__append_24) $(am__append_25) $(am__append_26)
 all: all-recursive
 
 .SUFFIXES:
@@ -1845,7 +1846,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

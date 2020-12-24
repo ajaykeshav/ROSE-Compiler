@@ -129,11 +129,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 noinst_PROGRAMS = injectOutlinePragmas$(EXEEXT) outlineRandom$(EXEEXT) \
 	outlineSelection$(EXEEXT)
 bin_PROGRAMS = outline$(EXEEXT)
-@USING_CLANG_COMPILER_FALSE@am__append_2 = \
+@USING_CLANG_COMPILER_FALSE@am__append_3 = \
 @USING_CLANG_COMPILER_FALSE@   test2004_76.C \
 @USING_CLANG_COMPILER_FALSE@   test2005_03.C \
 @USING_CLANG_COMPILER_FALSE@   test2005_11.C \
@@ -148,11 +155,10 @@ bin_PROGRAMS = outline$(EXEEXT)
 @USING_CLANG_COMPILER_FALSE@   test2007_141.C \
 @USING_CLANG_COMPILER_FALSE@   test2007_162.C 
 
+@USING_INTEL_COMPILER_FALSE@am__append_4 = $(dlopen3_test_targets)  
 TESTS = $(am__EXEEXT_4)
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_3 = $(noswitch_test_targets)
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_4 = $(noswitch_test_targets) \
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_5 = $(noswitch_test_targets) \
 @ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@	$(seq7b_test_targets)
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_5 = $(seq7b_test_targets)
 subdir = tests/nonsmoke/functional/roseTests/astOutliningTests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -317,10 +323,9 @@ am__DEPENDENCIES_8 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_7)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_7)
 injectOutlinePragmas_DEPENDENCIES = $(am__DEPENDENCIES_8)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -1169,10 +1174,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1280,8 +1285,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1563,9 +1569,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1600,27 +1610,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1665,18 +1664,23 @@ RTH_RUN = $(top_srcdir)/scripts/rth_run.pl $(RTH_RUN_FLAGS) \
 	VALGRIND=$(VALGRIND) TIMEOUT=$(RTH_TIMEOUT)
 
 RTH_STATS = $(top_srcdir)/scripts/rth_stats.pl
+
+#########################################################################################################################
+#					AUTOMAKE BOILERPLATE
+#########################################################################################################################
+TEST_TARGETS = $(FORTRAN_RESULTS) $(C_CXX_RESULTS)
 #test111:
 #	rm -rf ${dlopen4_test_lib_targets}
-TEST_TARGETS = injectOutlinePragmas.passed outlineRandom.passed \
-	$(failing_test_targets) $(classic_test_targets) \
-	$(omp_c_classic_test_targets) $(inplace_test_targets) \
-	$(tofile_test_targets) $(dlopen_test_targets) \
-	$(dlopen2_test_targets) $(dlopen3_test_targets) \
+C_CXX_RESULTS = injectOutlinePragmas.passed outlineRandom.passed \
+	$(classic_test_targets) $(omp_c_classic_test_targets) \
+	$(inplace_test_targets) $(tofile_test_targets) \
+	$(dlopen_test_targets) $(dlopen2_test_targets) $(am__append_4) \
 	$(dlopen4_test_targets) $(dlopen4_test_lib_targets) \
 	$(CXX4_TESTS_OBJECT_REQUIRED_TO_RUN) $(dlopen4_test_targets) \
 	$(dlopen4_test_lib_so_targets) $(PASSING_CXX_TEST_Executables) \
-	$(default_test_targets) $(am__append_3) $(seq7a_test_targets) \
-	$(am__append_5) complexStruct.passed
+	$(default_test_targets) $(seq7a_test_targets) \
+	complexStruct.passed
+FORTRAN_RESULTS = $(am__append_5)
 EXTRA_DIST = RandomStmtSelector.hh $(C_AND_CXX_TESTS_REQUIRED_TO_PASS) \
 	$(FORTRAN_TESTS_REQUIRED_TO_PASS) \
 	$(TESTCODE_CURRENTLY_FAILING) complexStruct.c
@@ -1728,24 +1732,31 @@ C_TESTS_REQUIRED_TO_PASS = \
 # This is not ready
 #         variables_in_header.c
 # template_function1.cpp
+# name qualification class ::A
+#	test_66_2020.cpp
 CXX_TESTS_REQUIRED_TO_PASS = \
 	array2.cpp				\
 	moreTest6.cpp				\
 	moreTest7.cpp				\
         charStar.cpp  \
-	reference.cpp
+	const-global.cpp \
+	reference.cpp 
 
 
 # Add a few tool_G's regression tests
 # 	test_26_v2_2020.cpp  this is not ready, not sure what happened for preprocessing
+#	test_66_2020.cpp
 CXX2_TESTS_REQUIRED_TO_PASS = \
- 	print.cpp \
+	print.cpp \
 	test_42_2020.cpp \
 	test_20_2019.cpp \
 	test_26_v1_2020.cpp \
 	charStar.cpp  \
 	test_37_2020.cpp \
-	ft_cfftz.cpp
+	ft_cfftz.cpp \
+	test_61_2020.cpp \
+	test_121_2020.cpp \
+	test_52.cpp
 
 
 #This set of CPP files must contain main() to run
@@ -1993,7 +2004,7 @@ EXAMPLE_CXX_TESTS_REQUIRED_TO_PASS = test_CplusplusMacro_Cpp.C \
 	test2007_170.C test2007_171.C test2007_172.C test2007_173.C \
 	test2008_04.C test_int_lexemes.C test_int_lexemes_donot_pass.C \
 	test_simple_int.C test_wchars.C lexPhase2003_01.C math.C \
-	inputForLoopLocator.C X.C inputBug317.C $(am__append_2)
+	inputForLoopLocator.C X.C inputBug317.C $(am__append_3)
 EXAMPLE_CXX_TESTS_REQUIRED_TO_PASS_SHORT = \
 test2001_02.C \
 test2001_03.C \
@@ -2033,7 +2044,6 @@ OUTLINE_FLAGS = --edg:no_warnings -rose:verbose 0 -rose:outline:parameter_wrappe
 
 #------------------------------------------------------------------------------------------------------------------------
 # Test outlining using the classic scheme, using tests within the current folder
-FORTRAN_RESULTS = $(am__append_4)
 classic_test_targets = $(addprefix classic_, $(addsuffix .passed, $(C_TESTS_REQUIRED_TO_PASS)))
 
 # Using tests  from OpenMP test folder, turning on the select_omp_loop option
@@ -2049,7 +2059,9 @@ tofile_test_targets = $(addprefix tofile_,  $(addsuffix .passed, $(C_AND_CXX_TES
 
 #------------------------------------------------------------------------------------------------------------------------
 # Test outlining to a separate file using dlopen
-dlopen_test_targets = $(addprefix dlopen_,  $(addsuffix .passed, $(C_TESTS_REQUIRED_TO_PASS)))
+dlopen_test_targets = $(addprefix dlopen_, $(addsuffix .passed, \
+	$(C_TESTS_REQUIRED_TO_PASS))) $(addprefix dlopen_, $(addsuffix \
+	.passed, $(CXX_TESTS_REQUIRED_TO_PASS)))
 dlopen_test_flags = \
 	-rose:outline:use_dlopen		\
 	-I$(abs_top_srcdir)/projects/autoTuning	\
@@ -2066,16 +2078,15 @@ dlopen2_test_flags = \
 	-I$(abs_top_srcdir)/projects/autoTuning	\
 	-rose:outline:output_path .
 
-
 # Liao, 2020//25
 # Similar to dlopen3, additionally
 # combined with -rose:unparseHeaderFiles -rose:unparseHeaderFilesRootFolder
-dlopen3_test_targets = $(addprefix dlopen3_,  $(addsuffix .passed, $(CXX2_TESTS_REQUIRED_TO_PASS)))
-dlopen3_test_flags = \
-	-rose:outline:use_dlopen		\
-	-rose:outline:copy_orig_file		\
-	-I$(abs_top_srcdir)/projects/autoTuning	\
-	-rose:outline:exclude_headers -rose:unparseHeaderFiles -rose:unparseHeaderFilesRootFolder unparseHeaderRoot_test_20_2019
+@USING_INTEL_COMPILER_FALSE@dlopen3_test_targets = $(addprefix dlopen3_,  $(addsuffix .passed, $(CXX2_TESTS_REQUIRED_TO_PASS)))
+@USING_INTEL_COMPILER_FALSE@dlopen3_test_flags = \
+@USING_INTEL_COMPILER_FALSE@	-rose:outline:use_dlopen		\
+@USING_INTEL_COMPILER_FALSE@	-rose:outline:copy_orig_file		\
+@USING_INTEL_COMPILER_FALSE@	-I$(abs_top_srcdir)/projects/autoTuning	\
+@USING_INTEL_COMPILER_FALSE@	-rose:outline:exclude_headers -rose:unparseHeaderFiles -rose:unparseHeaderFilesRootFolder unparseHeaderRoot_test_20_2019
 
 
 # Liao, 2020/8/24
@@ -2094,7 +2105,7 @@ dlopen4_test_flags = -fpermissive	\
 
 # build the executables
 AUTO_TUNING_PATH = $(top_builddir)/projects/autoTuning
-MY_FINAL_LINK = $(AUTO_TUNING_PATH)/libautoTuning.a -Wl,--export-dynamic -g -ldl -lm
+MY_FINAL_LINK = $(AUTO_TUNING_PATH)/libautoTuning.a -Wl,--export-dynamic -g -ldl -lm  $(LDFLAGS)
 PASSING_CXX_TEST_Executables = ${CXX4_TESTS_OBJECT_REQUIRED_TO_RUN:.o=.out}
 check_PROGRAM = $(PASSING_CXX_TEST_Executables)
 #------------------------------------------------------------------------------------------------------------------------
@@ -2682,7 +2693,6 @@ uninstall-am: uninstall-binPROGRAMS
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -2698,6 +2708,7 @@ clean-test-targets:
 clean-local: clean-test-targets
 
 .PHONY: clean-test-targets
+
 injectOutlinePragmas.passed: injectOutlinePragmas
 	@$(RTH_RUN) DISABLED="not tested by the original makefile" CMD=false $(TEST_EXIT_STATUS) $@
 outlineRandom.passed: outlineRandom
@@ -2741,6 +2752,7 @@ $(failing_test_targets): failing_%.passed: %
 # test2005_199.C  # conflicts with 'C' linkage: missing a top level global prototype
 # test2006_159.C  # hiddenlist problem: ambiguous call of overloaded ‘bar(N::A&)’
 # test2006_165.C  # same reason as for test2005_179.C                  
+check_classic:$(classic_test_targets)
 
 $(classic_test_targets): classic_%.passed: % outline
 	@$(RTH_RUN) \
@@ -2755,14 +2767,12 @@ $(omp_c_classic_test_targets): classic_%.passed: $(OpenMP_TEST_DIR)/% outline
 		USE_SUBDIR=yes \
 		CMD="$$(pwd)/outline$(EXEEXT) $(OpenMP_TEST_INCLUDES) -rose:outline:select_omp_loop -rose:outline:enable_classic -c $(abspath $<)" \
 		$(TEST_EXIT_STATUS) $@
-
 $(inplace_test_targets): inplace_%.passed: % outline
 	@$(RTH_RUN) \
 		TITLE="outline in-place $(notdir $<) [$@]" \
 		USE_SUBDIR=yes \
 		CMD="$$(pwd)/outline$(EXEEXT) $(TEST_INCLUDES) -rose:outline:temp_variable -c $(abspath $<)" \
 		$(TEST_EXIT_STATUS) $@
-
 $(tofile_test_targets): tofile_%.passed: % outline
 	@$(RTH_RUN) \
 		TITLE="outline new-file $(notdir $<) [$@]" \
@@ -2788,12 +2798,14 @@ $(dlopen2_test_targets): dlopen2_%.passed: % outline
 		CMD="$$(pwd)/outline$(EXEEXT) $(TEST_INCLUDES) $(dlopen2_test_flags) -c $(abspath $<)" \
 		$(TEST_EXIT_STATUS) $@
 
-$(dlopen3_test_targets): dlopen3_%.passed: % outline
-	@$(RTH_RUN) \
-		TITLE="outine dlopen3 $(notdir $<) [$@]" \
-		USE_SUBDIR=yes \
-		CMD="$$(pwd)/outline$(EXEEXT) $(TEST_INCLUDES) $(dlopen3_test_flags) -c $(abspath $<)" \
-		$(TEST_EXIT_STATUS) $@
+@USING_INTEL_COMPILER_FALSE@ # DQ (9/19/2020): Clang does not work with most of the test codes in this directory.
+
+@USING_INTEL_COMPILER_FALSE@$(dlopen3_test_targets): dlopen3_%.passed: % outline
+@USING_INTEL_COMPILER_FALSE@	@$(RTH_RUN) \
+@USING_INTEL_COMPILER_FALSE@		TITLE="outine dlopen3 $(notdir $<) [$@]" \
+@USING_INTEL_COMPILER_FALSE@		USE_SUBDIR=yes \
+@USING_INTEL_COMPILER_FALSE@		CMD="$$(pwd)/outline$(EXEEXT) $(TEST_INCLUDES) $(dlopen3_test_flags) -c $(abspath $<)" \
+@USING_INTEL_COMPILER_FALSE@		$(TEST_EXIT_STATUS) $@
 
 # shortcut to test the dlopen feature
 test_dlopen3: $(dlopen3_test_targets)
@@ -2816,7 +2828,6 @@ $(AUTO_TUNING_PATH)/libautoTuning.a:
 	make -C $(AUTO_TUNING_PATH)
 $(PASSING_CXX_TEST_Executables): %.out: %.o $(AUTO_TUNING_PATH)/libautoTuning.a rose_%_lib.so
 	$(LIBTOOL) --mode=link $(CXX) $< $(MY_FINAL_LINK) -o $@
-
 $(default_test_targets): default_%.passed: % outline
 	@$(RTH_RUN) \
 		TITLE="outline default $(notdir $<) [$@]" \
@@ -2846,6 +2857,7 @@ $(seq7b_test_targets): seq7b_%.passed: % outlineSelection
 		USE_SUBDIR=yes \
 		CMD="$$(pwd)/outlineSelection$(EXEEXT) $(TEST_INCLUDES) $(seq7b_test_flags) -c $(abspath $<)" \
 		$(TEST_EXIT_STATUS) $@
+
 complexStruct.passed: complexStruct.c outline
 	@$(RTH_RUN) \
 		USE_SUBDIR=yes \
@@ -2862,16 +2874,14 @@ test_class_ODR_violation: $(srcdir)/test_class_ODR_violation_main.C $(srcdir)/te
 #	Order does not appear to matter in the linking.
 	g++ test_class_ODR_violation_main.o test_class_ODR_violation_outlined.o -o test_class_ODR_violation
 
-#########################################################################################################################
-#					AUTOMAKE BOILERPLATE
-#########################################################################################################################
 # a shortcut to test Fortran only
 test-fortran: $(FORTRAN_RESULTS)
+test-c-cxx:$(C_CXX_RESULTS)  
 
-check-local: $(TEST_TARGETS)
+check-local: $(TEST_TARGETS) 
 
 clean-local:
-	rm -f $(TEST_TARGETS)
+	rm -f $(TEST_TARGETS) OUT__*.cpp rose_*.cpp
 	rm -f $(TEST_TARGETS:.passed=.failed)
 	rm -rf unparseHeaderRoot_test_20_2019
 

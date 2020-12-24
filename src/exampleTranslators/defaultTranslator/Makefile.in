@@ -114,11 +114,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 bin_PROGRAMS = defaultTranslator$(EXEEXT) \
 	preprocessingInfoDumper$(EXEEXT) mangledNameDumper$(EXEEXT) \
 	qualifiedNameDumper$(EXEEXT) KeepGoingTranslator$(EXEEXT) \
-	fileInfoDumper$(EXEEXT)
+	fileInfoDumper$(EXEEXT) textASTGenerator$(EXEEXT)
 subdir = exampleTranslators/defaultTranslator
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -282,10 +289,9 @@ am__DEPENDENCIES_8 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_7)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_7)
 KeepGoingTranslator_DEPENDENCIES = $(am__DEPENDENCIES_8)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -313,6 +319,10 @@ am_qualifiedNameDumper_OBJECTS = qualifiedNameDumper.$(OBJEXT)
 qualifiedNameDumper_OBJECTS = $(am_qualifiedNameDumper_OBJECTS)
 qualifiedNameDumper_LDADD = $(LDADD)
 qualifiedNameDumper_DEPENDENCIES = $(am__DEPENDENCIES_8)
+am_textASTGenerator_OBJECTS = textASTGenerator.$(OBJEXT)
+textASTGenerator_OBJECTS = $(am_textASTGenerator_OBJECTS)
+textASTGenerator_LDADD = $(LDADD)
+textASTGenerator_DEPENDENCIES = $(am__DEPENDENCIES_8)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -348,12 +358,12 @@ am__v_CXXLD_1 =
 SOURCES = $(KeepGoingTranslator_SOURCES) $(defaultTranslator_SOURCES) \
 	$(fileInfoDumper_SOURCES) $(mangledNameDumper_SOURCES) \
 	$(preprocessingInfoDumper_SOURCES) \
-	$(qualifiedNameDumper_SOURCES)
+	$(qualifiedNameDumper_SOURCES) $(textASTGenerator_SOURCES)
 DIST_SOURCES = $(KeepGoingTranslator_SOURCES) \
 	$(defaultTranslator_SOURCES) $(fileInfoDumper_SOURCES) \
 	$(mangledNameDumper_SOURCES) \
 	$(preprocessingInfoDumper_SOURCES) \
-	$(qualifiedNameDumper_SOURCES)
+	$(qualifiedNameDumper_SOURCES) $(textASTGenerator_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -926,10 +936,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1037,8 +1047,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1320,9 +1331,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1357,27 +1372,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1430,6 +1434,7 @@ mangledNameDumper_SOURCES = mangledNameDumper.C
 qualifiedNameDumper_SOURCES = qualifiedNameDumper.C
 KeepGoingTranslator_SOURCES = KeepGoingTranslator.cpp
 fileInfoDumper_SOURCES = fileInfoDumper.C
+textASTGenerator_SOURCES = textASTGenerator.C
 LDADD = $(ROSE_LIBS)
 EXTRA_DIST = CMakeLists.txt  test_mangeldName.c test_qualifiedName.cpp
 CLEANFILES = 
@@ -1540,6 +1545,10 @@ preprocessingInfoDumper$(EXEEXT): $(preprocessingInfoDumper_OBJECTS) $(preproces
 qualifiedNameDumper$(EXEEXT): $(qualifiedNameDumper_OBJECTS) $(qualifiedNameDumper_DEPENDENCIES) $(EXTRA_qualifiedNameDumper_DEPENDENCIES) 
 	@rm -f qualifiedNameDumper$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(qualifiedNameDumper_OBJECTS) $(qualifiedNameDumper_LDADD) $(LIBS)
+
+textASTGenerator$(EXEEXT): $(textASTGenerator_OBJECTS) $(textASTGenerator_DEPENDENCIES) $(EXTRA_textASTGenerator_DEPENDENCIES) 
+	@rm -f textASTGenerator$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(textASTGenerator_OBJECTS) $(textASTGenerator_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1791,7 +1800,6 @@ uninstall-am: uninstall-binPROGRAMS
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -1809,11 +1817,12 @@ clean-local: clean-test-targets
 .PHONY: clean-test-targets
 
 check-local:mangledNameDumper qualifiedNameDumper
-@ROSE_BUILD_C_LANGUAGE_SUPPORT_TRUE@	./mangledNameDumper -c $(srcdir)/test_mangeldName.c
-@ROSE_BUILD_C_LANGUAGE_SUPPORT_TRUE@	./qualifiedNameDumper -c $(srcdir)/test_qualifiedName.cpp
+@ROSE_BUILD_C_LANGUAGE_SUPPORT_TRUE@	./mangledNameDumper -c $(srcdir)/test_mangeldName.c &>log.txt
+@ROSE_BUILD_C_LANGUAGE_SUPPORT_TRUE@	./qualifiedNameDumper -c $(srcdir)/test_qualifiedName.cpp &> log.txt
+@ROSE_BUILD_C_LANGUAGE_SUPPORT_TRUE@	./textASTGenerator -c $(srcdir)/test_qualifiedName.cpp
 
 clean-local:
-	rm -rf Templates.DB ii_files ti_files rose_*.*
+	rm -rf Templates.DB ii_files ti_files rose_*.* log.txt
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

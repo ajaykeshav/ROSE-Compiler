@@ -116,8 +116,15 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-bin_PROGRAMS = codethorn$(EXEEXT) equithorn$(EXEEXT) memthorn$(EXEEXT) \
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+bin_PROGRAMS = codethorn$(EXEEXT) memthorn$(EXEEXT) \
 	parprothorn$(EXEEXT) ltlthorn$(EXEEXT) woodpecker$(EXEEXT) \
 	analyterix$(EXEEXT) addressTakenAnalysis$(EXEEXT) \
 	cldemo$(EXEEXT)
@@ -284,13 +291,12 @@ am__uninstall_files_from_dir = { \
   }
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcodethorn_la_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = libcodethorn_la-AbstractValue.lo \
 	libcodethorn_la-addressTakenAnalysis.lo \
 	libcodethorn_la-AliasAnalysis.lo libcodethorn_la-AstUtility.lo \
 	libcodethorn_la-AnalysisAstAnnotator.lo \
 	libcodethorn_la-AnalysisReporting.lo \
-	libcodethorn_la-Analyzer.lo \
+	libcodethorn_la-CTAnalysis.lo \
 	libcodethorn_la-ArrayElementAccessData.lo \
 	libcodethorn_la-AstNodeInfo.lo \
 	libcodethorn_la-AstTermRepresentation.lo \
@@ -306,16 +312,17 @@ am__objects_1 = libcodethorn_la-AbstractValue.lo \
 	libcodethorn_la-CTIOLabeler.lo \
 	libcodethorn_la-CtxCallStrings.lo \
 	libcodethorn_la-CtxPrioritySolver.lo \
-	libcodethorn_la-CtxReachabilityAnalysis.lo \
 	libcodethorn_la-CtxReachabilityLattice.lo \
 	libcodethorn_la-CtxSolver0.lo \
+	libcodethorn_la-CtxUnfoldedAnalysis.lo \
 	libcodethorn_la-DataDependenceVisualizer.lo \
 	libcodethorn_la-defUseQuery.lo \
 	libcodethorn_la-DataRaceDetection.lo \
+	libcodethorn_la-DFAnalysisBaseWithoutData.lo \
 	libcodethorn_la-DFAnalysisBase.lo \
+	libcodethorn_la-CSDFAnalysisBase.lo \
 	libcodethorn_la-DFTransferFunctions.lo \
 	libcodethorn_la-DotGraphCfgFrontend.lo \
-	libcodethorn_la-EquivalenceChecking.lo \
 	libcodethorn_la-EState.lo libcodethorn_la-EStateAnalysis.lo \
 	libcodethorn_la-EStateFactory.lo \
 	libcodethorn_la-EStateTransferFunctions.lo \
@@ -343,8 +350,8 @@ am__objects_1 = libcodethorn_la-AbstractValue.lo \
 	libcodethorn_la-LanguageRestrictor.lo \
 	libcodethorn_la-Lattice.lo libcodethorn_la-LoopInfo.lo \
 	libcodethorn_la-CodeThornOptions.lo \
-	libcodethorn_la-LTLOptions.lo \
-	ltlthorn-lib/libcodethorn_la-ParProOptions.lo \
+	libcodethorn_la-LTLOptions.lo libcodethorn_la-ParProOptions.lo \
+	libcodethorn_la-LTLRersMapping.lo \
 	libcodethorn_la-LVAnalysis.lo \
 	libcodethorn_la-LVAstAttribute.lo \
 	libcodethorn_la-LVAstAttributeInterface.lo \
@@ -361,7 +368,7 @@ am__objects_1 = libcodethorn_la-AbstractValue.lo \
 	libcodethorn_la-NormalizationInliner.lo \
 	libcodethorn_la-NormalizationOp.lo \
 	libcodethorn_la-NumberIntervalLattice.lo \
-	libcodethorn_la-PASolver1.lo \
+	libcodethorn_la-DFSolver1.lo libcodethorn_la-DFSolver2.lo \
 	libcodethorn_la-PointerAnalysisInterface.lo \
 	libcodethorn_la-PragmaHandler.lo \
 	libcodethorn_la-PredefinedSemanticFunctions.lo \
@@ -406,6 +413,7 @@ libcodethorn_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) \
 	$(libcodethorn_la_LDFLAGS) $(LDFLAGS) -o $@
 libltlthorn_la_LIBADD =
+am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 =  \
 	z3-prover-connection/libltlthorn_la-ReachabilityAnalyzerZ3.lo \
 	z3-prover-connection/libltlthorn_la-SSAGenerator.lo \
@@ -472,10 +480,9 @@ am__DEPENDENCIES_8 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_7)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_7)
 addressTakenAnalysis_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(addressTakenAnalysis_CXXFLAGS) $(CXXFLAGS) \
@@ -501,13 +508,6 @@ codethorn_OBJECTS = $(am_codethorn_OBJECTS)
 codethorn_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(codethorn_CXXFLAGS) \
 	$(CXXFLAGS) $(codethorn_LDFLAGS) $(LDFLAGS) -o $@
-am_equithorn_OBJECTS = equithorn-equithorn-LTLParser.$(OBJEXT) \
-	equithorn-EquiThornCommandLineOptions.$(OBJEXT) \
-	equithorn-equithorn.$(OBJEXT)
-equithorn_OBJECTS = $(am_equithorn_OBJECTS)
-equithorn_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(equithorn_CXXFLAGS) \
-	$(CXXFLAGS) $(equithorn_LDFLAGS) $(LDFLAGS) -o $@
 am_ltlthorn_OBJECTS = ltlthorn-ltlthorn-LTLParser.$(OBJEXT) \
 	ltlthorn-LTLThornCommandLineOptions.$(OBJEXT) \
 	ltlthorn-ltlthorn.$(OBJEXT)
@@ -600,13 +600,13 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libcodethorn_la_SOURCES) $(libltlthorn_la_SOURCES) \
 	$(addressTakenAnalysis_SOURCES) $(analyterix_SOURCES) \
-	$(cldemo_SOURCES) $(codethorn_SOURCES) $(equithorn_SOURCES) \
-	$(ltlthorn_SOURCES) $(memthorn_SOURCES) $(parprothorn_SOURCES) \
+	$(cldemo_SOURCES) $(codethorn_SOURCES) $(ltlthorn_SOURCES) \
+	$(memthorn_SOURCES) $(parprothorn_SOURCES) \
 	$(woodpecker_SOURCES)
 DIST_SOURCES = $(libcodethorn_la_SOURCES) $(libltlthorn_la_SOURCES) \
 	$(addressTakenAnalysis_SOURCES) $(analyterix_SOURCES) \
-	$(cldemo_SOURCES) $(codethorn_SOURCES) $(equithorn_SOURCES) \
-	$(ltlthorn_SOURCES) $(memthorn_SOURCES) $(parprothorn_SOURCES) \
+	$(cldemo_SOURCES) $(codethorn_SOURCES) $(ltlthorn_SOURCES) \
+	$(memthorn_SOURCES) $(parprothorn_SOURCES) \
 	$(woodpecker_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -636,9 +636,8 @@ CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/config/Makefile.for.ROSE.includes.and.libs \
 	$(top_srcdir)/config/mkinstalldirs $(top_srcdir)/config/ylwrap \
-	TODO codethorn-LTLParser.c++ equithorn-LTLParser.c++ \
-	ltlthorn-LTLParser.c++ memthorn-LTLParser.c++ \
-	parprothorn-LTLParser.c++
+	TODO codethorn-LTLParser.c++ ltlthorn-LTLParser.c++ \
+	memthorn-LTLParser.c++ parprothorn-LTLParser.c++
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ABS_COMPASS2_XML_SRCDIR = @ABS_COMPASS2_XML_SRCDIR@
 ACLOCAL = @ACLOCAL@
@@ -1188,10 +1187,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1299,8 +1298,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1582,9 +1582,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1619,27 +1623,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1712,8 +1705,6 @@ CODETHORN_SOLO_HEADER_FILES = \
   CtxAttribute.h \
   CtxLattice.h \
   CtxPropertyStateFactory.h \
-  CtxReachabilityFactory.h \
-  CtxReachabilityTransfer.h \
   CtxTransfer.h \
   DataDependenceVisualizer.h \
   EqualityMaintainer.h \
@@ -1734,7 +1725,7 @@ CODETHORN_HEADER_FILES = \
   AstUtility.h \
   AnalysisAstAnnotator.h \
   AnalysisReporting.h \
-  Analyzer.h \
+  CTAnalysis.h \
   ArrayElementAccessData.h \
   AstNodeInfo.h \
   AstTermRepresentation.h \
@@ -1752,17 +1743,19 @@ CODETHORN_HEADER_FILES = \
   CTIOLabeler.h \
   CtxCallStrings.h \
   CtxPrioritySolver.h \
-  CtxReachabilityAnalysis.h \
   CtxReachabilityLattice.h \
   CtxSolver0.h \
+  CtxUnfoldedAnalysis.h \
   DataDependenceVisualizer.h \
   DataRaceDetection.h \
   defUseQuery.h \
   DFAbstractSolver.h \
+  DFAnalysisBaseWithoutData.h \
   DFAnalysisBase.h \
+  CSDFAnalysisBase.h \
+  CSDFAnalysisBaseWithoutData.h \
   DFTransferFunctions.h \
   DotGraphCfgFrontend.h \
-  EquivalenceChecking.h \
   EState.h \
   EStateAnalysis.h \
   EStateFactory.h \
@@ -1811,8 +1804,10 @@ CODETHORN_HEADER_FILES = \
   Options.h \
   CodeThornOptions.h \
   LTLOptions.h \
-  ltlthorn-lib/ParProOptions.h \
-  PASolver1.h \
+  ParProOptions.h \
+  LTLRersMapping.h \
+  DFSolver1.h \
+  DFSolver2.h \
   PointerAnalysisInterface.h \
   PragmaHandler.h \
   PredefinedSemanticFunctions.h \
@@ -1831,6 +1826,7 @@ CODETHORN_HEADER_FILES = \
   ReachabilityAnalysis.h \
   ReadWriteAnalyzer.h \
   ReadWriteHistory.h \
+  RersSpecialization.h \
   RERS_empty_specialization.h \
   RersCounterexample.h \
   RewriteStatistics.h \
@@ -1861,7 +1857,7 @@ CODETHORN_SOURCE_FILES = \
   AstUtility.C \
   AnalysisAstAnnotator.C \
   AnalysisReporting.C \
-  Analyzer.C \
+  CTAnalysis.C \
   ArrayElementAccessData.C \
   AstNodeInfo.C \
   AstTermRepresentation.C \
@@ -1879,16 +1875,17 @@ CODETHORN_SOURCE_FILES = \
   CTIOLabeler.C \
   CtxCallStrings.C \
   CtxPrioritySolver.C \
-  CtxReachabilityAnalysis.C \
   CtxReachabilityLattice.C \
   CtxSolver0.C \
+  CtxUnfoldedAnalysis.C \
   DataDependenceVisualizer.C \
   defUseQuery.C \
   DataRaceDetection.C \
+  DFAnalysisBaseWithoutData.C \
   DFAnalysisBase.C \
+  CSDFAnalysisBase.C \
   DFTransferFunctions.C \
   DotGraphCfgFrontend.C \
-  EquivalenceChecking.C \
   EState.C \
   EStateAnalysis.C \
   EStateFactory.C \
@@ -1920,7 +1917,8 @@ CODETHORN_SOURCE_FILES = \
   LoopInfo.C \
   CodeThornOptions.C \
   LTLOptions.C \
-  ltlthorn-lib/ParProOptions.C \
+  ParProOptions.C \
+  LTLRersMapping.C \
   LVAnalysis.C \
   LVAstAttribute.C \
   LVAstAttributeInterface.C \
@@ -1937,7 +1935,8 @@ CODETHORN_SOURCE_FILES = \
   NormalizationInliner.C \
   NormalizationOp.C \
   NumberIntervalLattice.C \
-  PASolver1.C \
+  DFSolver1.C \
+  DFSolver2.C \
   PointerAnalysisInterface.C \
   PragmaHandler.C \
   PredefinedSemanticFunctions.C \
@@ -2139,40 +2138,6 @@ ltlthorn_SOURCES = \
 
 
 ##############################################################
-# TOOL: EQUITHORN
-##############################################################
-
-# yacc flags for LTL parser
-equithorn_YFLAGS = -p ltl_ 
-
-# this line creates speparately named object files
-equithorn_CXXFLAGS = -fopenmp -Wall -O3 
-
-# equithorn has most of its code organized in two separate libraries
-equithorn_DEPENDENCIES = libcodethorn.la libltlthorn.la
-@ROSE_WITH_SPOT_FALSE@equithorn_LDADD = $(LIBS_WITH_RPATH) $(ROSE_LIBS) -lcodethorn -lltlthorn
-
-#spot and bdd need to be linked last with gcc 5.4
-@ROSE_WITH_SPOT_TRUE@equithorn_LDADD = $(LIBS_WITH_RPATH) $(ROSE_LIBS) -lcodethorn -lltlthorn $(Z3_LINK) -lspot -lbdd 
-@ROSE_WITH_SPOT_TRUE@equithorn_LDFLAGS = -L$(SPOT_LIBRARY_PATH) $(Z3_LIB_INCLUDES)
-equithorndir = .
-
-# only informative
-equithorn_xHEADERS = \
-  CommandLineOptions.h \
-  EquiThornCommandLineOptions.h \
-  codethorn.h \
-  LTL.h
-
-
-# codethorn sources in addition to libcodethorn and libltlthorn
-equithorn_SOURCES = \
-  LTLParser.y++ \
-  EquiThornCommandLineOptions.C \
-  equithorn.C
-
-
-##############################################################
 # TOOL: PARPROTHORN
 ##############################################################
 
@@ -2324,11 +2289,11 @@ addressTakenAnalysis_SOURCES = \
 cldemo_LDADD = $(LIBS_WITH_RPATH) $(ROSE_LIBS)
 cldemo__CXXFLAGS = -Wall -O3 -march=native -ftree-vectorize
 cldemo_SOURCES = cldemo.C
-CHECK_DEFAULT_PASSING = check-codethorn-internal check-domain unit-test check-normalization check-equivalence check-par-cfg
+CHECK_DEFAULT_PASSING = check-codethorn-internal check-domain unit-test check-normalization check-par-cfg
 CHECK_DEFAULT_FAILING = check-data-races check-deadcode
 
-#CHECK_WITH_SPOT_ONLY=check-ltl check-ltl-driven
-CHECK_WITH_SPOT_ONLY_PASSING = check-svcomp-witness check-ltl check-ltl-driven-reset-analyzer
+#CHECK_WITH_SPOT_ONLY=check-ltl check-ltl-driven check-svcomp-witness
+CHECK_WITH_SPOT_ONLY_PASSING = check-ltl check-ltl-driven-reset-analyzer check-reachability
 CHECK_WITH_SPOT_PASSING = $(CHECK_DEFAULT_PASSING) $(CHECK_WITH_SPOT_ONLY_PASSING)
 
 # MS: 1-6 is reasonable for V1.2
@@ -2460,11 +2425,6 @@ clean-libLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-ltlthorn-lib/$(am__dirstamp):
-	@$(MKDIR_P) ltlthorn-lib
-	@: > ltlthorn-lib/$(am__dirstamp)
-ltlthorn-lib/libcodethorn_la-ParProOptions.lo:  \
-	ltlthorn-lib/$(am__dirstamp)
 
 libcodethorn.la: $(libcodethorn_la_OBJECTS) $(libcodethorn_la_DEPENDENCIES) $(EXTRA_libcodethorn_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libcodethorn_la_LINK) -rpath $(libdir) $(libcodethorn_la_OBJECTS) $(libcodethorn_la_LIBADD) $(LIBS)
@@ -2479,6 +2439,9 @@ z3-prover-connection/libltlthorn_la-PhiAttribute.lo:  \
 	z3-prover-connection/$(am__dirstamp)
 z3-prover-connection/libltlthorn_la-PhiStatement.lo:  \
 	z3-prover-connection/$(am__dirstamp)
+ltlthorn-lib/$(am__dirstamp):
+	@$(MKDIR_P) ltlthorn-lib
+	@: > ltlthorn-lib/$(am__dirstamp)
 ltlthorn-lib/libltlthorn_la-CounterexampleAnalyzer.lo:  \
 	ltlthorn-lib/$(am__dirstamp)
 ltlthorn-lib/libltlthorn_la-LtsminConnection.lo:  \
@@ -2559,10 +2522,6 @@ codethorn$(EXEEXT): $(codethorn_OBJECTS) $(codethorn_DEPENDENCIES) $(EXTRA_codet
 	@rm -f codethorn$(EXEEXT)
 	$(AM_V_CXXLD)$(codethorn_LINK) $(codethorn_OBJECTS) $(codethorn_LDADD) $(LIBS)
 
-equithorn$(EXEEXT): $(equithorn_OBJECTS) $(equithorn_DEPENDENCIES) $(EXTRA_equithorn_DEPENDENCIES) 
-	@rm -f equithorn$(EXEEXT)
-	$(AM_V_CXXLD)$(equithorn_LINK) $(equithorn_OBJECTS) $(equithorn_LDADD) $(LIBS)
-
 ltlthorn$(EXEEXT): $(ltlthorn_OBJECTS) $(ltlthorn_DEPENDENCIES) $(EXTRA_ltlthorn_DEPENDENCIES) 
 	@rm -f ltlthorn$(EXEEXT)
 	$(AM_V_CXXLD)$(ltlthorn_LINK) $(ltlthorn_OBJECTS) $(ltlthorn_LDADD) $(LIBS)
@@ -2634,8 +2593,8 @@ libcodethorn_la-AnalysisAstAnnotator.lo: AnalysisAstAnnotator.C
 libcodethorn_la-AnalysisReporting.lo: AnalysisReporting.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-AnalysisReporting.lo `test -f 'AnalysisReporting.C' || echo '$(srcdir)/'`AnalysisReporting.C
 
-libcodethorn_la-Analyzer.lo: Analyzer.C
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-Analyzer.lo `test -f 'Analyzer.C' || echo '$(srcdir)/'`Analyzer.C
+libcodethorn_la-CTAnalysis.lo: CTAnalysis.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CTAnalysis.lo `test -f 'CTAnalysis.C' || echo '$(srcdir)/'`CTAnalysis.C
 
 libcodethorn_la-ArrayElementAccessData.lo: ArrayElementAccessData.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-ArrayElementAccessData.lo `test -f 'ArrayElementAccessData.C' || echo '$(srcdir)/'`ArrayElementAccessData.C
@@ -2688,14 +2647,14 @@ libcodethorn_la-CtxCallStrings.lo: CtxCallStrings.C
 libcodethorn_la-CtxPrioritySolver.lo: CtxPrioritySolver.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CtxPrioritySolver.lo `test -f 'CtxPrioritySolver.C' || echo '$(srcdir)/'`CtxPrioritySolver.C
 
-libcodethorn_la-CtxReachabilityAnalysis.lo: CtxReachabilityAnalysis.C
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CtxReachabilityAnalysis.lo `test -f 'CtxReachabilityAnalysis.C' || echo '$(srcdir)/'`CtxReachabilityAnalysis.C
-
 libcodethorn_la-CtxReachabilityLattice.lo: CtxReachabilityLattice.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CtxReachabilityLattice.lo `test -f 'CtxReachabilityLattice.C' || echo '$(srcdir)/'`CtxReachabilityLattice.C
 
 libcodethorn_la-CtxSolver0.lo: CtxSolver0.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CtxSolver0.lo `test -f 'CtxSolver0.C' || echo '$(srcdir)/'`CtxSolver0.C
+
+libcodethorn_la-CtxUnfoldedAnalysis.lo: CtxUnfoldedAnalysis.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CtxUnfoldedAnalysis.lo `test -f 'CtxUnfoldedAnalysis.C' || echo '$(srcdir)/'`CtxUnfoldedAnalysis.C
 
 libcodethorn_la-DataDependenceVisualizer.lo: DataDependenceVisualizer.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DataDependenceVisualizer.lo `test -f 'DataDependenceVisualizer.C' || echo '$(srcdir)/'`DataDependenceVisualizer.C
@@ -2706,17 +2665,20 @@ libcodethorn_la-defUseQuery.lo: defUseQuery.C
 libcodethorn_la-DataRaceDetection.lo: DataRaceDetection.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DataRaceDetection.lo `test -f 'DataRaceDetection.C' || echo '$(srcdir)/'`DataRaceDetection.C
 
+libcodethorn_la-DFAnalysisBaseWithoutData.lo: DFAnalysisBaseWithoutData.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DFAnalysisBaseWithoutData.lo `test -f 'DFAnalysisBaseWithoutData.C' || echo '$(srcdir)/'`DFAnalysisBaseWithoutData.C
+
 libcodethorn_la-DFAnalysisBase.lo: DFAnalysisBase.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DFAnalysisBase.lo `test -f 'DFAnalysisBase.C' || echo '$(srcdir)/'`DFAnalysisBase.C
+
+libcodethorn_la-CSDFAnalysisBase.lo: CSDFAnalysisBase.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-CSDFAnalysisBase.lo `test -f 'CSDFAnalysisBase.C' || echo '$(srcdir)/'`CSDFAnalysisBase.C
 
 libcodethorn_la-DFTransferFunctions.lo: DFTransferFunctions.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DFTransferFunctions.lo `test -f 'DFTransferFunctions.C' || echo '$(srcdir)/'`DFTransferFunctions.C
 
 libcodethorn_la-DotGraphCfgFrontend.lo: DotGraphCfgFrontend.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DotGraphCfgFrontend.lo `test -f 'DotGraphCfgFrontend.C' || echo '$(srcdir)/'`DotGraphCfgFrontend.C
-
-libcodethorn_la-EquivalenceChecking.lo: EquivalenceChecking.C
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-EquivalenceChecking.lo `test -f 'EquivalenceChecking.C' || echo '$(srcdir)/'`EquivalenceChecking.C
 
 libcodethorn_la-EState.lo: EState.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-EState.lo `test -f 'EState.C' || echo '$(srcdir)/'`EState.C
@@ -2811,8 +2773,11 @@ libcodethorn_la-CodeThornOptions.lo: CodeThornOptions.C
 libcodethorn_la-LTLOptions.lo: LTLOptions.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-LTLOptions.lo `test -f 'LTLOptions.C' || echo '$(srcdir)/'`LTLOptions.C
 
-ltlthorn-lib/libcodethorn_la-ParProOptions.lo: ltlthorn-lib/ParProOptions.C
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o ltlthorn-lib/libcodethorn_la-ParProOptions.lo `test -f 'ltlthorn-lib/ParProOptions.C' || echo '$(srcdir)/'`ltlthorn-lib/ParProOptions.C
+libcodethorn_la-ParProOptions.lo: ParProOptions.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-ParProOptions.lo `test -f 'ParProOptions.C' || echo '$(srcdir)/'`ParProOptions.C
+
+libcodethorn_la-LTLRersMapping.lo: LTLRersMapping.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-LTLRersMapping.lo `test -f 'LTLRersMapping.C' || echo '$(srcdir)/'`LTLRersMapping.C
 
 libcodethorn_la-LVAnalysis.lo: LVAnalysis.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-LVAnalysis.lo `test -f 'LVAnalysis.C' || echo '$(srcdir)/'`LVAnalysis.C
@@ -2862,8 +2827,11 @@ libcodethorn_la-NormalizationOp.lo: NormalizationOp.C
 libcodethorn_la-NumberIntervalLattice.lo: NumberIntervalLattice.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-NumberIntervalLattice.lo `test -f 'NumberIntervalLattice.C' || echo '$(srcdir)/'`NumberIntervalLattice.C
 
-libcodethorn_la-PASolver1.lo: PASolver1.C
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-PASolver1.lo `test -f 'PASolver1.C' || echo '$(srcdir)/'`PASolver1.C
+libcodethorn_la-DFSolver1.lo: DFSolver1.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DFSolver1.lo `test -f 'DFSolver1.C' || echo '$(srcdir)/'`DFSolver1.C
+
+libcodethorn_la-DFSolver2.lo: DFSolver2.C
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-DFSolver2.lo `test -f 'DFSolver2.C' || echo '$(srcdir)/'`DFSolver2.C
 
 libcodethorn_la-PointerAnalysisInterface.lo: PointerAnalysisInterface.C
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcodethorn_la_CXXFLAGS) $(CXXFLAGS) -c -o libcodethorn_la-PointerAnalysisInterface.lo `test -f 'PointerAnalysisInterface.C' || echo '$(srcdir)/'`PointerAnalysisInterface.C
@@ -3126,24 +3094,6 @@ codethorn-codethorn.o: codethorn.C
 codethorn-codethorn.obj: codethorn.C
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(codethorn_CXXFLAGS) $(CXXFLAGS) -c -o codethorn-codethorn.obj `if test -f 'codethorn.C'; then $(CYGPATH_W) 'codethorn.C'; else $(CYGPATH_W) '$(srcdir)/codethorn.C'; fi`
 
-equithorn-equithorn-LTLParser.o: equithorn-LTLParser.c++
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-equithorn-LTLParser.o `test -f 'equithorn-LTLParser.c++' || echo '$(srcdir)/'`equithorn-LTLParser.c++
-
-equithorn-equithorn-LTLParser.obj: equithorn-LTLParser.c++
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-equithorn-LTLParser.obj `if test -f 'equithorn-LTLParser.c++'; then $(CYGPATH_W) 'equithorn-LTLParser.c++'; else $(CYGPATH_W) '$(srcdir)/equithorn-LTLParser.c++'; fi`
-
-equithorn-EquiThornCommandLineOptions.o: EquiThornCommandLineOptions.C
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-EquiThornCommandLineOptions.o `test -f 'EquiThornCommandLineOptions.C' || echo '$(srcdir)/'`EquiThornCommandLineOptions.C
-
-equithorn-EquiThornCommandLineOptions.obj: EquiThornCommandLineOptions.C
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-EquiThornCommandLineOptions.obj `if test -f 'EquiThornCommandLineOptions.C'; then $(CYGPATH_W) 'EquiThornCommandLineOptions.C'; else $(CYGPATH_W) '$(srcdir)/EquiThornCommandLineOptions.C'; fi`
-
-equithorn-equithorn.o: equithorn.C
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-equithorn.o `test -f 'equithorn.C' || echo '$(srcdir)/'`equithorn.C
-
-equithorn-equithorn.obj: equithorn.C
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(equithorn_CXXFLAGS) $(CXXFLAGS) -c -o equithorn-equithorn.obj `if test -f 'equithorn.C'; then $(CYGPATH_W) 'equithorn.C'; else $(CYGPATH_W) '$(srcdir)/equithorn.C'; fi`
-
 ltlthorn-ltlthorn-LTLParser.o: ltlthorn-LTLParser.c++
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ltlthorn_CXXFLAGS) $(CXXFLAGS) -c -o ltlthorn-ltlthorn-LTLParser.o `test -f 'ltlthorn-LTLParser.c++' || echo '$(srcdir)/'`ltlthorn-LTLParser.c++
 
@@ -3250,11 +3200,6 @@ codethorn-LTLParser.c++: LTLParser.y++
 	$(AM_V_YACC) \
 	$(am__skipyacc) \
 	$(SHELL) $(YLWRAP) `test -f 'LTLParser.y++' || echo '$(srcdir)/'`LTLParser.y++ y.tab.c codethorn-LTLParser.c++ y.tab.h `echo codethorn-LTLParser.c++ | $(am__yacc_c2h)` y.output codethorn-LTLParser.output -- $(YACC) $(codethorn_YFLAGS) $(YFLAGS)
-
-equithorn-LTLParser.c++: LTLParser.y++
-	$(AM_V_YACC) \
-	$(am__skipyacc) \
-	$(SHELL) $(YLWRAP) `test -f 'LTLParser.y++' || echo '$(srcdir)/'`LTLParser.y++ y.tab.c equithorn-LTLParser.c++ y.tab.h `echo equithorn-LTLParser.c++ | $(am__yacc_c2h)` y.output equithorn-LTLParser.output -- $(YACC) $(equithorn_YFLAGS) $(YFLAGS)
 
 ltlthorn-LTLParser.c++: LTLParser.y++
 	$(AM_V_YACC) \
@@ -3432,7 +3377,6 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -f codethorn-LTLParser.c++
-	-rm -f equithorn-LTLParser.c++
 	-rm -f ltlthorn-LTLParser.c++
 	-rm -f memthorn-LTLParser.c++
 	-rm -f parprothorn-LTLParser.c++
@@ -3536,7 +3480,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-codethornincludeHEADERS \
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -3587,6 +3530,8 @@ check-matcher-demo:
 
 check-matcher:
 	./matcher_demo  --edg:no_warnings $(srcdir)/tests/basictest5.C < $(srcdir)/tests/matchexpressions/test1.mat
+
+check-default: $(CHECK_DEFAULT_PASSING)
 
 @ROSE_WITH_SPOT_TRUE@check-local: $(CHECK_WITH_SPOT_PASSING)
 @ROSE_WITH_SPOT_FALSE@check-local: $(CHECK_DEFAULT_PASSING)
@@ -3725,15 +3670,8 @@ check-ltl-driven-reset-analyzer:
 check-svcomp-witness:
 	./codethorn $(srcdir)/tests/svcomp/eca-rers2012/Problem01_label15_false-unreach-call.c --svcomp-mode --input-values="{1,2,3,4,5,6}" --witness-file=toBeImplemented.witness --with-counterexamples
 
-check-equivalence:
-	@rm -f tmp.nsdump
-	@echo ================================================================
-	@echo RUNNING UPDATE SEQUENCE VERIFICATION TESTS
-	@echo ================================================================
-	@./equithorn --edg:no_warnings --normalize-all=off $(srcdir)/tests/jacobi-1d-imper_mod.c --dump-non-sorted=tmp.nsdump --rule-commutative-sort=no --abstraction-mode=0
-#	@diff tmp.nsdump $(srcdir)/tests/jacobi-1d-imper_mod.c.nsdump
-	@cat tmp.nsdump
-	@rm -f tmp.nsdump
+check-reachability:
+	./codethorn $(srcdir)/tests/rers/Problem1911_opt.c --input-values="{1,2,3,4,5,6,7,8,9,10}" --status --threads=6 --with-counterexamples
 
 check-commandline-options: ./codethorn
 	@echo ================================================================
@@ -3775,6 +3713,7 @@ clean-local:
 	rm -f *.imout.check
 	rm -Rf make_check_log_*
 	rm -f *-LTLParser.c++
+	rm -f *.csv
 
 distclean-local: clean
 	rm -f *.tgz

@@ -113,20 +113,27 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-@USING_INTEL_COMPILER_FALSE@am__append_2 = \
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+@USING_INTEL_COMPILER_FALSE@am__append_3 = \
 @USING_INTEL_COMPILER_FALSE@   test2014_01.c \
 @USING_INTEL_COMPILER_FALSE@   test2014_02.c \
 @USING_INTEL_COMPILER_FALSE@   test2014_04.c \
 @USING_INTEL_COMPILER_FALSE@   test2014_05.c 
 
-@USING_INTEL_COMPILER_TRUE@am__append_3 = \
+@USING_INTEL_COMPILER_TRUE@am__append_4 = \
 @USING_INTEL_COMPILER_TRUE@   test2014_01.c \
 @USING_INTEL_COMPILER_TRUE@   test2014_02.c \
 @USING_INTEL_COMPILER_TRUE@   test2014_04.c \
 @USING_INTEL_COMPILER_TRUE@   test2014_05.c 
 
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_4 = --edg:no_warnings --edg:restrict
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_5 = --edg:no_warnings --edg:restrict
 subdir = tests/nonsmoke/functional/CompileTests/C11_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -826,10 +833,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -937,8 +944,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1220,9 +1228,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1257,27 +1269,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1329,8 +1330,8 @@ EXAMPLE_TESTCODES_REQUIRED_TO_PASS = test2014_03.c test2014_06.c \
 	test2014_19.c test2014_20.c test2014_21.c test2014_22.c \
 	test2014_23.c test2014_24.c test2014_25.c test2014_26.c \
 	test2014_27.c test2014_28.c test2014_29.c test2014_30.c last.c \
-	$(am__append_2)
-TESTCODE_CURRENTLY_FAILING = $(am__append_3)
+	$(am__append_3)
+TESTCODE_CURRENTLY_FAILING = $(am__append_4)
 
 # Note: last.C just simplifies the Makefile.am it
 # avoids common makefle errors in adding new files.
@@ -1356,7 +1357,7 @@ TEST_TRANSLATOR = ../../testTranslator
 #########
 # ROSE_FLAGS
 LANG_FLAGS = -std=c11
-ROSE_FLAGS = $(am__append_4) -w -rose:verbose 0 \
+ROSE_FLAGS = $(am__append_5) -w -rose:verbose 0 \
 	-rose:skip_unparse_asm_commands
 
 #
@@ -1569,7 +1570,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

@@ -113,8 +113,23 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@am__append_2 = \
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+@USING_CLANG_COMPILER_FALSE@am__append_3 = \
+@USING_CLANG_COMPILER_FALSE@   test2014_110.C
+
+
+# DQ (9/19/2020): this test fails with the Intel v17 compiler (something regarding boost).
+@USING_INTEL_COMPILER_FALSE@am__append_4 = \
+@USING_INTEL_COMPILER_FALSE@   test2017_63.C 
+
+@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@am__append_5 = \
 @ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@     test2017_31.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@     test2017_32.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@     test2017_46.C \
@@ -123,9 +138,9 @@ host_triplet = @host@
 @ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@     test2015_135.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@     test2015_136.C
 
-@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@@USING_INTEL_COMPILER_TRUE@am__append_3 = test2017_69.C
-@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_4 = test2017_69.C
-@ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@am__append_5 = \
+@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@@USING_INTEL_COMPILER_TRUE@am__append_6 = test2017_69.C
+@ROSE_USING_GCC_VERSION_LATER_4_4_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_7 = test2017_69.C
+@ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@am__append_8 = \
 @ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@     test2017_31.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@     test2017_32.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@     test2017_44.C \
@@ -136,37 +151,39 @@ host_triplet = @host@
 @ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@     test2015_135.C \
 @ROSE_USING_GCC_VERSION_LATER_4_4_FALSE@     test2015_136.C
 
-@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@am__append_6 = \
-@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@     test2015_126.C \
+@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@@USING_CLANG_COMPILER_FALSE@am__append_9 = \
+@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@@USING_CLANG_COMPILER_FALSE@     test2015_126.C 
+
+@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@am__append_10 = \
 @ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@     test2015_127.C \
 @ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@     test2015_129.C 
 
-@ROSE_USING_GCC_VERSION_LATER_4_8_FALSE@am__append_7 = \
+@ROSE_USING_GCC_VERSION_LATER_4_8_FALSE@am__append_11 = \
 @ROSE_USING_GCC_VERSION_LATER_4_8_FALSE@     test2015_126.C \
 @ROSE_USING_GCC_VERSION_LATER_4_8_FALSE@     test2015_127.C \
 @ROSE_USING_GCC_VERSION_LATER_4_8_FALSE@     test2015_129.C 
 
-@ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@am__append_8 = \
+@ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@am__append_12 = \
 @ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@     test2018_01.C
 
-@ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@am__append_9 = \
+@ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@am__append_13 = \
 @ROSE_USING_GCC_VERSION_LATER_6_0_TRUE@     rose-1701-1.C
 
-@ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@am__append_10 = \
+@ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@am__append_14 = \
 @ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@     test2018_01.C
 
-@ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@am__append_11 = \
+@ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@am__append_15 = \
 @ROSE_USING_GCC_VERSION_LATER_6_0_FALSE@     rose-1701-1.C
 
-@ROSE_USING_BOOST_VERSION_1_57_TRUE@am__append_12 = \
+@ROSE_USING_BOOST_VERSION_1_57_TRUE@am__append_16 = \
 @ROSE_USING_BOOST_VERSION_1_57_TRUE@     test2014_77.C \
 @ROSE_USING_BOOST_VERSION_1_57_TRUE@     test2014_78.C 
 
-@ROSE_USING_BOOST_VERSION_1_57_FALSE@am__append_13 = \
+@ROSE_USING_BOOST_VERSION_1_57_FALSE@am__append_17 = \
 @ROSE_USING_BOOST_VERSION_1_57_FALSE@     test2014_77.C \
 @ROSE_USING_BOOST_VERSION_1_57_FALSE@     test2014_78.C 
 
-@USING_CLANG_COMPILER_TRUE@am__append_14 = \
+@USING_CLANG_COMPILER_TRUE@am__append_18 = \
 @USING_CLANG_COMPILER_TRUE@     test2014_71.C \
 @USING_CLANG_COMPILER_TRUE@     test2014_111.C \
 @USING_CLANG_COMPILER_TRUE@     test2015_70.C \
@@ -193,7 +210,7 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_TRUE@     test2013_246.C \
 @USING_CLANG_COMPILER_TRUE@     test2013_235.C 
 
-@USING_CLANG_COMPILER_FALSE@am__append_15 = \
+@USING_CLANG_COMPILER_FALSE@am__append_19 = \
 @USING_CLANG_COMPILER_FALSE@     test2014_71.C \
 @USING_CLANG_COMPILER_FALSE@     test2014_111.C \
 @USING_CLANG_COMPILER_FALSE@     test2015_70.C \
@@ -210,7 +227,7 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_FALSE@     test2013_246.C \
 @USING_CLANG_COMPILER_FALSE@     test2013_235.C 
 
-@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_16 = \
+@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_20 = \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@       test2014_187.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@       test2014_187_work_around.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@       test2014_188.C \
@@ -222,7 +239,7 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@       test2015_55.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@       test2016_20.C
 
-@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@am__append_17 = \
+@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@am__append_21 = \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@       test2014_187.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@       test2014_187_work_around.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@       test2014_188.C \
@@ -234,25 +251,25 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@       test2015_55.C \
 @USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_TRUE@       test2016_20.C
 
-@USING_INTEL_COMPILER_TRUE@am__append_18 = \
+@USING_INTEL_COMPILER_TRUE@am__append_22 = \
 @USING_INTEL_COMPILER_TRUE@     test2014_159.C \
 @USING_INTEL_COMPILER_TRUE@     test2014_211.C \
 @USING_INTEL_COMPILER_TRUE@     test2006_08.C \
 @USING_INTEL_COMPILER_TRUE@     test2006_37.C
 
-@USING_INTEL_COMPILER_TRUE@am__append_19 = \
+@USING_INTEL_COMPILER_TRUE@am__append_23 = \
 @USING_INTEL_COMPILER_TRUE@     rose-1962.C
 
-@USING_INTEL_COMPILER_FALSE@am__append_20 = \
+@USING_INTEL_COMPILER_FALSE@am__append_24 = \
 @USING_INTEL_COMPILER_FALSE@     rose-1962.C
 
-@USING_INTEL_COMPILER_FALSE@am__append_21 = \
+@USING_INTEL_COMPILER_FALSE@am__append_25 = \
 @USING_INTEL_COMPILER_FALSE@     test2014_159.C \
 @USING_INTEL_COMPILER_FALSE@     test2014_211.C \
 @USING_INTEL_COMPILER_FALSE@     test2006_08.C \
 @USING_INTEL_COMPILER_FALSE@     test2006_37.C
 
-@OS_MACOSX_TRUE@am__append_22 = \
+@OS_MACOSX_TRUE@am__append_26 = \
 @OS_MACOSX_TRUE@     test2004_77.C \
 @OS_MACOSX_TRUE@     test2006_20.C \
 @OS_MACOSX_TRUE@     test2011_141.C \
@@ -262,7 +279,7 @@ host_triplet = @host@
 @OS_MACOSX_TRUE@     test2013_164.C \
 @OS_MACOSX_TRUE@     test2013_212.C 
 
-@OS_MACOSX_FALSE@am__append_23 = \
+@OS_MACOSX_FALSE@am__append_27 = \
 @OS_MACOSX_FALSE@     test2004_77.C \
 @OS_MACOSX_FALSE@     test2006_20.C \
 @OS_MACOSX_FALSE@     test2011_141.C \
@@ -272,7 +289,43 @@ host_triplet = @host@
 @OS_MACOSX_FALSE@     test2013_164.C \
 @OS_MACOSX_FALSE@     test2013_212.C 
 
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_24 = --edg:no_warnings --edg:restrict
+
+# DQ (9/17/2020): This is a new organization of the files that are passing only specific compilers.
+# INTEL compiler
+#      EXAMPLE_TESTCODES_REQUIRED_TO_PASS += 
+
+# CLANG compiler
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_28 = \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2012_129.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2014_05.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2020_02.C
+
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_29 = \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2015_115.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2015_116.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2015_148.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2016_15.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2016_16.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2016_17.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2016_18.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2016_89.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2017_50.C 
+
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_30 = \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2012_129.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2014_05.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2015_115.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2015_116.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2015_148.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2016_15.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2016_16.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2016_17.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2016_18.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2016_89.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2017_50.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_02.C 
+
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_31 = --edg:no_warnings --edg:restrict
 subdir = tests/nonsmoke/functional/CompileTests/Cxx_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -974,10 +1027,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1085,8 +1138,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1368,9 +1422,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1405,27 +1463,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -3048,280 +3095,284 @@ EXAMPLE_TESTCODES_REQUIRED_TO_PASS = Area-01.C dynamic_cast.C \
 	test2012_117.C test2012_118.C test2012_119.C test2012_11.C \
 	test2012_120.C test2012_121.C test2012_122.C test2012_123.C \
 	test2012_124.C test2012_125.C test2012_126.C test2012_127.C \
-	test2012_128.C test2012_129.C test2012_12.C test2012_130.C \
-	test2012_131.C test2012_132.C test2012_136.C test2012_137.C \
-	test2012_138.C test2012_13.C test2012_141.C test2012_142.C \
-	test2012_143.C test2012_144.C test2012_145.C test2012_146.C \
-	test2012_147.C test2012_148.C test2012_149.C test2012_14.C \
-	test2012_150.C test2012_151.C test2012_152.C test2012_153.C \
-	test2012_154.C test2012_155.C test2012_156.C test2012_157.C \
-	test2012_158.C test2012_159.C test2012_15.C test2012_160.C \
-	test2012_161.C test2012_162.C test2012_163.C test2012_164.C \
-	test2012_165.C test2012_166.C test2012_167.C test2012_168.C \
-	test2012_169.C test2012_16.C test2012_170.C test2012_171.C \
-	test2012_172.C test2012_173.C test2012_174.C test2012_175.C \
-	test2012_176.C test2012_177.C test2012_178.C test2012_179.C \
-	test2012_17.C test2012_180.C test2012_181.C test2012_182.C \
-	test2012_183.C test2012_184.C test2012_185.C test2012_186.C \
-	test2012_187.C test2012_18.C test2012_190.C test2012_191.C \
-	test2012_192.C test2012_193.C test2012_194.C test2012_195.C \
-	test2012_196.C test2012_197.C test2012_198.C test2012_199.C \
-	test2012_19.C test2012_200.C test2012_201.C test2012_202.C \
-	test2012_203.C test2012_204.C test2012_205.C test2012_206.C \
-	test2012_207.C test2012_208.C test2012_209.C test2012_20.C \
-	test2012_210.C test2012_211.C test2012_212.C test2012_213.C \
-	test2012_214.C test2012_215.C test2012_216.C test2012_217.C \
-	test2012_218.C test2012_219.C test2012_21.C test2012_220.C \
-	test2012_221.C test2012_222.C test2012_223.C test2012_224.C \
-	test2012_225.C test2012_226.C test2012_227.C test2012_228.C \
-	test2012_229.C test2012_22.C test2012_230.C test2012_231.C \
-	test2012_232.C test2012_233.C test2012_234.C test2012_235.C \
-	test2012_236.C test2012_237.C test2012_238.C test2012_239.C \
-	test2012_23.C test2012_240.C test2012_241.C test2012_242.C \
-	test2012_243.C test2012_244.C test2012_245.C test2012_246a.C \
-	test2012_246b.C test2012_247.C test2012_248.C test2012_249.C \
-	test2012_24.C test2012_250.C test2012_251.C test2012_253.C \
-	test2012_254.C test2012_255.C test2012_256.C test2012_257.C \
-	test2012_258.C test2012_259.C test2012_25.C test2012_260.C \
-	test2012_262.C test2012_263.C test2012_264.C test2012_265.C \
-	test2012_266.C test2012_267.C test2012_268.C test2012_269.C \
-	test2012_26.C test2012_270.C test2012_271.C test2012_27.C \
-	test2012_28.C test2012_29.C test2012_30.C test2012_31.C \
-	test2012_32.C test2012_33.C test2012_34.C test2012_36.C \
-	test2012_37.C test2012_38.C test2012_39.C test2012_40.C \
-	test2012_41.C test2012_42.C test2012_43.C test2012_44.C \
-	test2012_45.C test2012_46.C test2012_47.C test2012_48.C \
-	test2012_49.C test2012_50.C test2012_51.C test2012_52.C \
-	test2012_53.C test2012_54.C test2012_55.C test2012_56.C \
-	test2012_57.C test2012_58.C test2012_59.C test2012_60.C \
-	test2012_61.C test2012_62.C test2012_63.C test2012_64.C \
-	test2012_65.C test2012_66.C test2012_67.C test2012_69.C \
-	test2012_70.C test2012_71.C test2012_72.C test2012_73.C \
-	test2012_74.C test2012_75.C test2012_76.C test2012_77.C \
-	test2012_78.C test2012_80.C test2012_81.C test2012_82.C \
-	test2012_83.C test2012_84.C test2012_85.C test2012_87.C \
-	test2012_88.C test2012_89.C test2012_91.C test2012_92.C \
-	test2012_93.C test2012_94.C test2012_95.C test2012_96.C \
-	test2012_97.C test2012_98.C test2012_99.C test2013_01.C \
-	test2013_02.C test2013_03.C test2013_04.C test2013_05.C \
-	test2013_06.C test2013_07.C test2013_08.C test2013_09.C \
-	test2013_100.C test2013_101.C test2013_102.C test2013_103.C \
-	test2013_104.C test2013_105.C test2013_106.C test2013_107.C \
-	test2013_108.C test2013_109.C test2013_10.C test2013_110.C \
-	test2013_111.C test2013_112.C test2013_113.C test2013_114.C \
-	test2013_115.C test2013_116.C test2013_117.C test2013_118.C \
-	test2013_119.C test2013_11.C test2013_120.C test2013_121.C \
-	test2013_122.C test2013_123.C test2013_124.C test2013_125.C \
-	test2013_126.C test2013_127.C test2013_128.C test2013_129.C \
-	test2013_12.C test2013_130.C test2013_131.C test2013_132.C \
-	test2013_133.C test2013_134.C test2013_135.C test2013_136.C \
-	test2013_137.C test2013_138.C test2013_139.C test2013_140.C \
-	test2013_141.C test2013_142.C test2013_143.C test2013_144.C \
-	test2013_145.C test2013_146.C test2013_147.C test2013_148.C \
-	test2013_149.C test2013_150.C test2013_151.C test2013_152.C \
-	test2013_153.C test2013_154.C test2013_155.C test2013_156.C \
-	test2013_157.C test2013_158.C test2013_159.C test2013_160.C \
-	test2013_161.C test2013_162.C test2013_163.C test2013_165.C \
-	test2013_166.C test2013_167.C test2013_168.C test2013_169.C \
-	test2013_16.C test2013_170.C test2013_171.C test2013_172.C \
-	test2013_173.C test2013_174.C test2013_175.C test2013_176.C \
-	test2013_177.C test2013_178.C test2013_179.C test2013_17.C \
-	test2013_180.C test2013_181.C test2013_182.C test2013_183.C \
-	test2013_184.C test2013_186.C test2013_187.C test2013_188.C \
-	test2013_189.C test2013_18.C test2013_190.C test2013_191.C \
-	test2013_192.C test2013_193.C test2013_194.C test2013_195.C \
-	test2013_196.C test2013_198.C test2013_199.C test2013_200.C \
-	test2013_201.C test2013_202.C test2013_203.C test2013_204.C \
-	test2013_205.C test2013_206.C test2013_207.C test2013_208.C \
-	test2013_209.C test2013_20.C test2013_210.C test2013_211.C \
-	test2013_213.C test2013_214.C test2013_215.C test2013_216.C \
-	test2013_217.C test2013_218.C test2013_219.C test2013_21.C \
-	test2013_220.C test2013_221.C test2013_222.C test2013_223.C \
-	test2013_225.C test2013_226.C test2013_227.C test2013_228.C \
-	test2013_229.C test2013_22.C test2013_230.C test2013_231.C \
-	test2013_232.C test2013_237.C test2013_238.C test2013_239.C \
-	test2013_23.C test2013_244.C test2013_250.C test2013_251.C \
-	test2013_252.C test2013_253.C test2013_255.C test2013_256.C \
-	test2013_258.C test2013_259.C test2013_25.C test2013_261.C \
-	test2013_26.C test2013_271.C test2013_272.C test2013_273.C \
-	test2013_274.C test2013_275.C test2013_276.C test2013_277.C \
-	test2013_278.C test2013_279.C test2013_27.C test2013_280.C \
-	test2013_281.C test2013_282.C test2013_283.C test2013_284.C \
-	test2013_285.C test2013_286.C test2013_287.C test2013_288.C \
-	test2013_289.C test2013_28.C test2013_290.C test2013_291.C \
-	test2013_292.C test2013_293.C test2013_294.C test2013_295.C \
-	test2013_296.C test2013_29.C test2013_300.C test2013_301.C \
-	test2013_302.C test2013_303.C test2013_305.C test2013_306.C \
-	test2013_307.C test2013_308.C test2013_310.C test2013_311.C \
-	test2013_312.C test2013_313.C test2013_314.C test2013_315.C \
-	test2013_316.C test2013_317.C test2013_318.C test2013_319.C \
-	test2013_31.C test2013_320.C test2013_32.C test2013_33.C \
-	test2013_34.C test2013_36.C test2013_37.C test2013_38.C \
-	test2013_39.C test2013_40.C test2013_44.C test2013_46.C \
-	test2013_47.C test2013_48.C test2013_50.C test2013_51.C \
-	test2013_52.C test2013_53.C test2013_54.C test2013_55.C \
-	test2013_56.C test2013_57.C test2013_58.C test2013_59.C \
-	test2013_60.C test2013_61.C test2013_64.C test2013_65.C \
-	test2013_66.C test2013_67.C test2013_68.C test2013_69.C \
-	test2013_70.C test2013_71.C test2013_72.C test2013_73.C \
-	test2013_74.C test2013_75.C test2013_76.C test2013_77.C \
-	test2013_78.C test2013_79.C test2013_80.C test2013_81.C \
-	test2013_82.C test2013_83.C test2013_84.C test2013_85.C \
-	test2013_86.C test2013_87.C test2013_88.C test2013_89.C \
-	test2013_90.C test2013_91.C test2013_92.C test2013_93.C \
-	test2013_94.C test2013_95.C test2013_96.C test2013_97.C \
-	test2013_98.C test2013_99.C test2013_milind_01.C test2014_01.C \
-	test2014_02.C test2014_03.C test2014_04.C test2014_05.C \
-	test2014_06.C test2014_07.C test2014_08.C test2014_09.C \
-	test2014_100.C test2014_101.C test2014_102.C test2014_107.C \
-	test2014_108.C test2014_109.C test2014_10.C test2014_110.C \
-	test2014_112.C test2014_114.C test2014_115.C test2014_116.C \
-	test2014_117.C test2014_118.C test2014_119.C test2014_11.C \
-	test2014_120.C test2014_121.C test2014_122.C test2014_123.C \
-	test2014_124.C test2014_125.C test2014_126.C test2014_127.C \
-	test2014_128.C test2014_129.C test2014_12.C test2014_130.C \
-	test2014_131.C test2014_132.C test2014_133.C test2014_134.C \
-	test2014_135.C test2014_136.C test2014_137.C test2014_139.C \
-	test2014_13.C test2014_140.C test2014_141.C test2014_142.C \
-	test2014_143.C test2014_144.C test2014_145.C test2014_146.C \
-	test2014_147.C test2014_148.C test2014_149.C test2014_150.C \
-	test2014_151.C test2014_152.C test2014_153.C test2014_154.C \
-	test2014_155.C test2014_156.C test2014_157.C test2014_160.C \
-	test2014_161.C test2014_162.C test2014_163.C test2014_165.C \
-	test2014_166.C test2014_167.C test2014_168.C test2014_169.C \
-	test2014_16.C test2014_170.C test2014_171.C test2014_172.C \
-	test2014_174.C test2014_176.C test2014_177.C test2014_178.C \
-	test2014_179.C test2014_17.C test2014_182.C test2014_183.C \
-	test2014_184.C test2014_185.C test2014_186.C test2014_189.C \
-	test2014_18.C test2014_190.C test2014_191.C test2014_192.C \
-	test2014_193.C test2014_194.C test2014_195.C test2014_196.C \
-	test2014_197.C test2014_198.C test2014_199.C test2014_19.C \
-	test2014_200.C test2014_201.C test2014_202.C test2014_203.C \
-	test2014_204.C test2014_205.C test2014_206.C test2014_207.C \
-	test2014_208.C test2014_209.C test2014_20.C test2014_210.C \
-	test2014_212.C test2014_215.C test2014_216.C test2014_217.C \
-	test2014_218.C test2014_219.C test2014_21.C test2014_220.C \
-	test2014_221.C test2014_222.C test2014_223.C test2014_224.C \
-	test2014_225.C test2014_226.C test2014_230.C test2014_231.C \
-	test2014_232.C test2014_233.C test2014_234.C test2014_235.C \
-	test2014_239.C test2014_240.C test2014_241.C test2014_242.C \
-	test2014_243.C test2014_24.C test2014_26.C test2014_27.C \
-	test2014_28.C test2014_29.C test2014_30.C test2014_31.C \
-	test2014_32.C test2014_33.C test2014_34.C test2014_35.C \
-	test2014_36.C test2014_37.C test2014_38.C test2014_39.C \
-	test2014_40.C test2014_41.C test2014_43.C test2014_45.C \
-	test2014_47.C test2014_48.C test2014_49.C test2014_50.C \
-	test2014_53.C test2014_54.C test2014_55.C test2014_56.C \
-	test2014_57.C test2014_58.C test2014_60.C test2014_61.C \
-	test2014_62.C test2014_67.C test2014_68.C test2014_70.C \
-	test2014_72.C test2014_73.C test2014_74.C test2014_75.C \
-	test2014_76.C test2014_79.C test2014_80.C test2014_82.C \
-	test2014_83.C test2014_84.C test2014_85.C test2014_86.C \
-	test2014_87.C test2014_88.C test2014_89.C test2014_90.C \
-	test2014_91.C test2014_92.C test2014_93.C test2014_94.C \
-	test2014_95.C test2014_96.C test2014_97.C test2014_98.C \
-	test2014_99.C test2015_01.C test2015_02.C test2015_03.C \
-	test2015_04.C test2015_05.C test2015_07.C test2015_08.C \
-	test2015_09.C test2015_100.C test2015_101.C test2015_102.C \
-	test2015_103.C test2015_104.C test2015_106.C test2015_107.C \
-	test2015_108.C test2015_110.C test2015_111.C test2015_112.C \
-	test2015_113.C test2015_114.C test2015_115.C test2015_116.C \
-	test2015_117.C test2015_118.C test2015_119.C test2015_121.C \
-	test2015_122.C test2015_123.C test2015_124.C test2015_125.C \
-	test2015_128.C test2015_130.C test2015_131.C test2015_132.C \
-	test2015_133.C test2015_134.C test2015_137.C test2015_138.C \
-	test2015_139.C test2015_140.C test2015_141.C test2015_142.C \
-	test2015_143.C test2015_144.C test2015_145.C test2015_146.C \
-	test2015_147.C test2015_148.C test2015_149.C test2015_150.C \
-	test2015_151.C test2015_152.C test2015_153.C test2015_154.C \
-	test2015_20.C test2015_21.C test2015_22.C test2015_24.C \
-	test2015_26.C test2015_27.C test2015_28.C test2015_29.C \
-	test2015_30.C test2015_32.C test2015_33.C test2015_34.C \
-	test2015_35.C test2015_36.C test2015_40.C test2015_43.C \
-	test2015_44.C test2015_45.C test2015_50.C test2015_52.C \
-	test2015_57.C test2015_58.C test2015_59.C test2015_60.C \
-	test2015_61.C test2015_76.C test2015_77.C test2015_78.C \
-	test2015_79.C test2015_80.C test2015_85.C test2015_86.C \
-	test2015_88.C test2015_89.C test2015_97.C test2015_99.C \
-	test2016_01.C test2016_02.C test2016_03.C test2016_04.C \
-	test2016_05.C test2016_06.C test2016_07.C test2016_08.C \
-	test2016_09.C test2016_10.C test2016_11.C test2016_12.C \
-	test2016_13.C test2016_14.C test2016_15.C test2016_16.C \
-	test2016_17.C test2016_18.C test2016_19.C test2016_21.C \
-	test2016_25.C test2016_26.C test2016_27.C test2016_28.C \
-	test2016_29.C test2016_30.C test2016_31.C test2016_32.C \
-	test2016_33.C test2016_34.C test2016_36.C test2016_37.C \
-	test2016_38.C test2016_40.C test2016_41.C test2016_42.C \
-	test2016_43.C test2016_44.C test2016_45.C test2016_46.C \
-	test2016_47.C test2016_48.C test2016_49.C test2016_50.C \
-	test2016_51.C test2016_53.C test2016_54.C test2016_55.C \
-	test2016_56.C test2016_57.C test2016_59.C test2016_60.C \
-	test2016_61.C test2016_62.C test2016_63.C test2016_64.C \
-	test2016_65.C test2016_66.C test2016_67.C test2016_68.C \
-	test2016_69.C test2016_70.C test2016_71.C test2016_80.C \
-	test2016_81.C test2016_83.C test2016_85.C test2016_86.C \
-	test2016_87.C test2016_88.C test2016_89.C test2016_91.C \
-	test2016_93.C test2017_01.C test2017_02.C test2017_03.C \
-	test2017_04.C test2017_09.C test2017_100.C test2017_101.C \
-	test2017_102.C test2017_103.C test2017_104.C test2017_105.C \
-	test2017_106.C test2017_107.C test2017_10.C test2017_11.C \
-	test2017_13.C test2017_14.C test2017_15.C test2017_16.C \
-	test2017_17.C test2017_18.C test2017_19.C test2017_21.C \
-	test2017_22.C test2017_23.C test2017_26.C test2017_27.C \
-	test2017_28.C test2017_30.C test2017_35.C test2017_36.C \
-	test2017_37.C test2017_38.C test2017_39.C test2017_40.C \
-	test2017_41.C test2017_42.C test2017_43.C test2017_45.C \
-	test2017_48.C test2017_49.C test2017_50.C test2017_51.C \
+	test2012_128.C test2012_12.C test2012_130.C test2012_131.C \
+	test2012_132.C test2012_136.C test2012_137.C test2012_138.C \
+	test2012_13.C test2012_141.C test2012_142.C test2012_143.C \
+	test2012_144.C test2012_145.C test2012_146.C test2012_147.C \
+	test2012_148.C test2012_149.C test2012_14.C test2012_150.C \
+	test2012_151.C test2012_152.C test2012_153.C test2012_154.C \
+	test2012_155.C test2012_156.C test2012_157.C test2012_158.C \
+	test2012_159.C test2012_15.C test2012_160.C test2012_161.C \
+	test2012_162.C test2012_163.C test2012_164.C test2012_165.C \
+	test2012_166.C test2012_167.C test2012_168.C test2012_169.C \
+	test2012_16.C test2012_170.C test2012_171.C test2012_172.C \
+	test2012_173.C test2012_174.C test2012_175.C test2012_176.C \
+	test2012_177.C test2012_178.C test2012_179.C test2012_17.C \
+	test2012_180.C test2012_181.C test2012_182.C test2012_183.C \
+	test2012_184.C test2012_185.C test2012_186.C test2012_187.C \
+	test2012_18.C test2012_190.C test2012_191.C test2012_192.C \
+	test2012_193.C test2012_194.C test2012_195.C test2012_196.C \
+	test2012_197.C test2012_198.C test2012_199.C test2012_19.C \
+	test2012_200.C test2012_201.C test2012_202.C test2012_203.C \
+	test2012_204.C test2012_205.C test2012_206.C test2012_207.C \
+	test2012_208.C test2012_209.C test2012_20.C test2012_210.C \
+	test2012_211.C test2012_212.C test2012_213.C test2012_214.C \
+	test2012_215.C test2012_216.C test2012_217.C test2012_218.C \
+	test2012_219.C test2012_21.C test2012_220.C test2012_221.C \
+	test2012_222.C test2012_223.C test2012_224.C test2012_225.C \
+	test2012_226.C test2012_227.C test2012_228.C test2012_229.C \
+	test2012_22.C test2012_230.C test2012_231.C test2012_232.C \
+	test2012_233.C test2012_234.C test2012_235.C test2012_236.C \
+	test2012_237.C test2012_238.C test2012_239.C test2012_23.C \
+	test2012_240.C test2012_241.C test2012_242.C test2012_243.C \
+	test2012_244.C test2012_245.C test2012_246a.C test2012_246b.C \
+	test2012_247.C test2012_248.C test2012_249.C test2012_24.C \
+	test2012_250.C test2012_251.C test2012_253.C test2012_254.C \
+	test2012_255.C test2012_256.C test2012_257.C test2012_258.C \
+	test2012_259.C test2012_25.C test2012_260.C test2012_262.C \
+	test2012_263.C test2012_264.C test2012_265.C test2012_266.C \
+	test2012_267.C test2012_268.C test2012_269.C test2012_26.C \
+	test2012_270.C test2012_271.C test2012_27.C test2012_28.C \
+	test2012_29.C test2012_30.C test2012_31.C test2012_32.C \
+	test2012_33.C test2012_34.C test2012_36.C test2012_37.C \
+	test2012_38.C test2012_39.C test2012_40.C test2012_41.C \
+	test2012_42.C test2012_43.C test2012_44.C test2012_45.C \
+	test2012_46.C test2012_47.C test2012_48.C test2012_49.C \
+	test2012_50.C test2012_51.C test2012_52.C test2012_53.C \
+	test2012_54.C test2012_55.C test2012_56.C test2012_57.C \
+	test2012_58.C test2012_59.C test2012_60.C test2012_61.C \
+	test2012_62.C test2012_63.C test2012_64.C test2012_65.C \
+	test2012_66.C test2012_67.C test2012_69.C test2012_70.C \
+	test2012_71.C test2012_72.C test2012_73.C test2012_74.C \
+	test2012_75.C test2012_76.C test2012_77.C test2012_78.C \
+	test2012_80.C test2012_81.C test2012_82.C test2012_83.C \
+	test2012_84.C test2012_85.C test2012_87.C test2012_88.C \
+	test2012_89.C test2012_91.C test2012_92.C test2012_93.C \
+	test2012_94.C test2012_95.C test2012_96.C test2012_97.C \
+	test2012_98.C test2012_99.C test2013_01.C test2013_02.C \
+	test2013_03.C test2013_04.C test2013_05.C test2013_06.C \
+	test2013_07.C test2013_08.C test2013_09.C test2013_100.C \
+	test2013_101.C test2013_102.C test2013_103.C test2013_104.C \
+	test2013_105.C test2013_106.C test2013_107.C test2013_108.C \
+	test2013_109.C test2013_10.C test2013_110.C test2013_111.C \
+	test2013_112.C test2013_113.C test2013_114.C test2013_115.C \
+	test2013_116.C test2013_117.C test2013_118.C test2013_119.C \
+	test2013_11.C test2013_120.C test2013_121.C test2013_122.C \
+	test2013_123.C test2013_124.C test2013_125.C test2013_126.C \
+	test2013_127.C test2013_128.C test2013_129.C test2013_12.C \
+	test2013_130.C test2013_131.C test2013_132.C test2013_133.C \
+	test2013_134.C test2013_135.C test2013_136.C test2013_137.C \
+	test2013_138.C test2013_139.C test2013_140.C test2013_141.C \
+	test2013_142.C test2013_143.C test2013_144.C test2013_145.C \
+	test2013_146.C test2013_147.C test2013_148.C test2013_149.C \
+	test2013_150.C test2013_151.C test2013_152.C test2013_153.C \
+	test2013_154.C test2013_155.C test2013_156.C test2013_157.C \
+	test2013_158.C test2013_159.C test2013_160.C test2013_161.C \
+	test2013_162.C test2013_163.C test2013_165.C test2013_166.C \
+	test2013_167.C test2013_168.C test2013_169.C test2013_16.C \
+	test2013_170.C test2013_171.C test2013_172.C test2013_173.C \
+	test2013_174.C test2013_175.C test2013_176.C test2013_177.C \
+	test2013_178.C test2013_179.C test2013_17.C test2013_180.C \
+	test2013_181.C test2013_182.C test2013_183.C test2013_184.C \
+	test2013_186.C test2013_187.C test2013_188.C test2013_189.C \
+	test2013_18.C test2013_190.C test2013_191.C test2013_192.C \
+	test2013_193.C test2013_194.C test2013_195.C test2013_196.C \
+	test2013_198.C test2013_199.C test2013_200.C test2013_201.C \
+	test2013_202.C test2013_203.C test2013_204.C test2013_205.C \
+	test2013_206.C test2013_207.C test2013_208.C test2013_209.C \
+	test2013_20.C test2013_210.C test2013_211.C test2013_213.C \
+	test2013_214.C test2013_215.C test2013_216.C test2013_217.C \
+	test2013_218.C test2013_219.C test2013_21.C test2013_220.C \
+	test2013_221.C test2013_222.C test2013_223.C test2013_225.C \
+	test2013_226.C test2013_227.C test2013_228.C test2013_229.C \
+	test2013_22.C test2013_230.C test2013_231.C test2013_232.C \
+	test2013_237.C test2013_238.C test2013_239.C test2013_23.C \
+	test2013_244.C test2013_250.C test2013_251.C test2013_252.C \
+	test2013_253.C test2013_255.C test2013_256.C test2013_258.C \
+	test2013_259.C test2013_25.C test2013_261.C test2013_26.C \
+	test2013_271.C test2013_272.C test2013_273.C test2013_274.C \
+	test2013_275.C test2013_276.C test2013_277.C test2013_278.C \
+	test2013_279.C test2013_27.C test2013_280.C test2013_281.C \
+	test2013_282.C test2013_283.C test2013_284.C test2013_285.C \
+	test2013_286.C test2013_287.C test2013_288.C test2013_289.C \
+	test2013_28.C test2013_290.C test2013_291.C test2013_292.C \
+	test2013_293.C test2013_294.C test2013_295.C test2013_296.C \
+	test2013_29.C test2013_300.C test2013_301.C test2013_302.C \
+	test2013_303.C test2013_305.C test2013_306.C test2013_307.C \
+	test2013_308.C test2013_310.C test2013_311.C test2013_312.C \
+	test2013_313.C test2013_314.C test2013_315.C test2013_316.C \
+	test2013_317.C test2013_318.C test2013_319.C test2013_31.C \
+	test2013_320.C test2013_32.C test2013_33.C test2013_34.C \
+	test2013_36.C test2013_37.C test2013_38.C test2013_39.C \
+	test2013_40.C test2013_44.C test2013_46.C test2013_47.C \
+	test2013_48.C test2013_50.C test2013_51.C test2013_52.C \
+	test2013_53.C test2013_54.C test2013_55.C test2013_56.C \
+	test2013_57.C test2013_58.C test2013_59.C test2013_60.C \
+	test2013_61.C test2013_64.C test2013_65.C test2013_66.C \
+	test2013_67.C test2013_68.C test2013_69.C test2013_70.C \
+	test2013_71.C test2013_72.C test2013_73.C test2013_74.C \
+	test2013_75.C test2013_76.C test2013_77.C test2013_78.C \
+	test2013_79.C test2013_80.C test2013_81.C test2013_82.C \
+	test2013_83.C test2013_84.C test2013_85.C test2013_86.C \
+	test2013_87.C test2013_88.C test2013_89.C test2013_90.C \
+	test2013_91.C test2013_92.C test2013_93.C test2013_94.C \
+	test2013_95.C test2013_96.C test2013_97.C test2013_98.C \
+	test2013_99.C test2013_milind_01.C test2014_01.C test2014_02.C \
+	test2014_03.C test2014_04.C test2014_06.C test2014_07.C \
+	test2014_08.C test2014_09.C test2014_100.C test2014_101.C \
+	test2014_102.C test2014_107.C test2014_108.C test2014_109.C \
+	test2014_10.C test2014_112.C test2014_114.C test2014_115.C \
+	test2014_116.C test2014_117.C test2014_118.C test2014_119.C \
+	test2014_11.C test2014_120.C test2014_121.C test2014_122.C \
+	test2014_123.C test2014_124.C test2014_125.C test2014_126.C \
+	test2014_127.C test2014_128.C test2014_129.C test2014_12.C \
+	test2014_130.C test2014_131.C test2014_132.C test2014_133.C \
+	test2014_134.C test2014_135.C test2014_136.C test2014_137.C \
+	test2014_139.C test2014_13.C test2014_140.C test2014_141.C \
+	test2014_142.C test2014_143.C test2014_144.C test2014_145.C \
+	test2014_146.C test2014_147.C test2014_148.C test2014_149.C \
+	test2014_150.C test2014_151.C test2014_152.C test2014_153.C \
+	test2014_154.C test2014_155.C test2014_156.C test2014_157.C \
+	test2014_160.C test2014_161.C test2014_162.C test2014_163.C \
+	test2014_165.C test2014_166.C test2014_167.C test2014_168.C \
+	test2014_169.C test2014_16.C test2014_170.C test2014_171.C \
+	test2014_172.C test2014_174.C test2014_176.C test2014_177.C \
+	test2014_178.C test2014_179.C test2014_17.C test2014_182.C \
+	test2014_183.C test2014_184.C test2014_185.C test2014_186.C \
+	test2014_189.C test2014_18.C test2014_190.C test2014_191.C \
+	test2014_192.C test2014_193.C test2014_194.C test2014_195.C \
+	test2014_196.C test2014_197.C test2014_198.C test2014_199.C \
+	test2014_19.C test2014_200.C test2014_201.C test2014_202.C \
+	test2014_203.C test2014_204.C test2014_205.C test2014_206.C \
+	test2014_207.C test2014_208.C test2014_209.C test2014_20.C \
+	test2014_210.C test2014_212.C test2014_215.C test2014_216.C \
+	test2014_217.C test2014_218.C test2014_219.C test2014_21.C \
+	test2014_220.C test2014_221.C test2014_222.C test2014_223.C \
+	test2014_224.C test2014_225.C test2014_226.C test2014_230.C \
+	test2014_231.C test2014_232.C test2014_233.C test2014_234.C \
+	test2014_235.C test2014_239.C test2014_240.C test2014_241.C \
+	test2014_242.C test2014_243.C test2014_24.C test2014_26.C \
+	test2014_27.C test2014_28.C test2014_29.C test2014_30.C \
+	test2014_31.C test2014_32.C test2014_33.C test2014_34.C \
+	test2014_35.C test2014_36.C test2014_37.C test2014_38.C \
+	test2014_39.C test2014_40.C test2014_41.C test2014_43.C \
+	test2014_45.C test2014_47.C test2014_48.C test2014_49.C \
+	test2014_50.C test2014_53.C test2014_54.C test2014_55.C \
+	test2014_56.C test2014_57.C test2014_58.C test2014_60.C \
+	test2014_61.C test2014_62.C test2014_67.C test2014_68.C \
+	test2014_70.C test2014_72.C test2014_73.C test2014_74.C \
+	test2014_75.C test2014_76.C test2014_79.C test2014_80.C \
+	test2014_82.C test2014_83.C test2014_84.C test2014_85.C \
+	test2014_86.C test2014_87.C test2014_88.C test2014_89.C \
+	test2014_90.C test2014_91.C test2014_92.C test2014_93.C \
+	test2014_94.C test2014_95.C test2014_96.C test2014_97.C \
+	test2014_98.C test2014_99.C test2015_01.C test2015_02.C \
+	test2015_03.C test2015_04.C test2015_05.C test2015_07.C \
+	test2015_08.C test2015_09.C test2015_100.C test2015_101.C \
+	test2015_102.C test2015_103.C test2015_104.C test2015_106.C \
+	test2015_107.C test2015_108.C test2015_110.C test2015_111.C \
+	test2015_112.C test2015_113.C test2015_114.C test2015_117.C \
+	test2015_118.C test2015_119.C test2015_121.C test2015_122.C \
+	test2015_123.C test2015_124.C test2015_125.C test2015_128.C \
+	test2015_130.C test2015_131.C test2015_132.C test2015_133.C \
+	test2015_134.C test2015_137.C test2015_138.C test2015_139.C \
+	test2015_140.C test2015_141.C test2015_142.C test2015_143.C \
+	test2015_144.C test2015_145.C test2015_146.C test2015_147.C \
+	test2015_149.C test2015_150.C test2015_151.C test2015_152.C \
+	test2015_153.C test2015_154.C test2015_20.C test2015_21.C \
+	test2015_22.C test2015_24.C test2015_26.C test2015_27.C \
+	test2015_28.C test2015_29.C test2015_30.C test2015_32.C \
+	test2015_33.C test2015_34.C test2015_35.C test2015_36.C \
+	test2015_40.C test2015_43.C test2015_44.C test2015_45.C \
+	test2015_50.C test2015_52.C test2015_57.C test2015_58.C \
+	test2015_59.C test2015_60.C test2015_61.C test2015_76.C \
+	test2015_77.C test2015_78.C test2015_79.C test2015_80.C \
+	test2015_85.C test2015_86.C test2015_88.C test2015_89.C \
+	test2015_97.C test2015_99.C test2016_01.C test2016_02.C \
+	test2016_03.C test2016_04.C test2016_05.C test2016_06.C \
+	test2016_07.C test2016_08.C test2016_09.C test2016_10.C \
+	test2016_11.C test2016_12.C test2016_13.C test2016_14.C \
+	test2016_19.C test2016_21.C test2016_25.C test2016_26.C \
+	test2016_27.C test2016_28.C test2016_29.C test2016_30.C \
+	test2016_31.C test2016_32.C test2016_33.C test2016_34.C \
+	test2016_36.C test2016_37.C test2016_38.C test2016_40.C \
+	test2016_41.C test2016_42.C test2016_43.C test2016_44.C \
+	test2016_45.C test2016_46.C test2016_47.C test2016_48.C \
+	test2016_49.C test2016_50.C test2016_51.C test2016_53.C \
+	test2016_54.C test2016_55.C test2016_56.C test2016_57.C \
+	test2016_59.C test2016_60.C test2016_61.C test2016_62.C \
+	test2016_63.C test2016_64.C test2016_65.C test2016_66.C \
+	test2016_67.C test2016_68.C test2016_69.C test2016_70.C \
+	test2016_71.C test2016_80.C test2016_81.C test2016_83.C \
+	test2016_85.C test2016_86.C test2016_87.C test2016_88.C \
+	test2016_91.C test2016_93.C test2017_01.C test2017_02.C \
+	test2017_03.C test2017_04.C test2017_09.C test2017_100.C \
+	test2017_101.C test2017_102.C test2017_103.C test2017_104.C \
+	test2017_105.C test2017_106.C test2017_107.C test2017_10.C \
+	test2017_11.C test2017_13.C test2017_14.C test2017_15.C \
+	test2017_16.C test2017_17.C test2017_18.C test2017_19.C \
+	test2017_21.C test2017_22.C test2017_23.C test2017_26.C \
+	test2017_27.C test2017_28.C test2017_30.C test2017_35.C \
+	test2017_36.C test2017_37.C test2017_38.C test2017_39.C \
+	test2017_40.C test2017_41.C test2017_42.C test2017_43.C \
+	test2017_45.C test2017_48.C test2017_49.C test2017_51.C \
 	test2017_52.C test2017_53.C test2017_54.C test2017_55.C \
 	test2017_56.C test2017_57.C test2017_58.C test2017_60.C \
-	test2017_61.C test2017_62.C test2017_63.C test2017_64.C \
-	test2017_65.C test2017_66.C test2017_68.C test2017_70.C \
-	test2017_71.C test2017_72.C test2017_73.C test2017_74.C \
-	test2017_75.C test2017_76.C test2017_77.C test2017_78.C \
-	test2017_79.C test2017_80.C test2017_81.C test2017_82.C \
-	test2017_83.C test2017_84.C test2017_87.C test2017_88.C \
-	test2017_89.C test2017_90.C test2017_91.C test2017_92.C \
-	test2017_93.C test2017_94.C test2017_95.C test2017_96.C \
-	test2017_97.C test2017_98.C test2018_02.C test2018_03.C \
-	test2018_04.C test2018_05.C test2018_06.C test2018_07.C \
-	test2018_08.C test2018_09.C test2018_10.C test2018_11.C \
-	test2018_12.C test2018_13.C test2018_14.C test2018_15.C \
-	test2018_16.C test2018_17.C test2018_18.C test2018_19.C \
-	test2018_20.C test2018_21.C test2018_24.C test2018_27.C \
-	test2018_29.C test2018_30.C test2018_32.C test2018_33.C \
-	test2018_34.C test2018_35.C test2018_36.C test2018_37.C \
-	test2018_38.C test2018_39.C test2018_40.C test2018_41.C \
-	test2018_42.C test2018_43.C test2018_44.C test2018_45.C \
-	test2018_46.C test2018_47.C test2018_48.C test2018_49.C \
-	test2018_50.C test2018_51.C test2018_52.C test2018_53.C \
-	test2018_54.C test2018_55.C test2018_56.C test2018_57.C \
-	test2018_58.C test2018_59.C test2018_60.C test2018_61.C \
-	test2018_62.C test2018_63.C test2018_64.C test2019_01.C \
-	test2019_02.C test2019_03.C test2019_04.C test2019_05.C \
-	test2019_06.C test2019_07.C test2019_08.C test2019_09.C \
-	test2019_10.C test2019_11.C test2019_12.C test2019_13.C \
-	test2019_14.C test2019_15.C test2019_16.C test2019_17.C \
-	test2019_18.C test2019_19.C test2019_20.C test2019_21.C \
-	test2019_22.C test2019_23.C test2019_24.C test2020_01.C \
-	test2020_02.C test2020_03.C test2020_04.C test2020_05.C \
-	test2020_06.C test2020_07.C test2020_08.C test2020_09.C \
-	test2020_10.C test2020_11.C test2020_12.C test2020_13.C \
-	test2020_14.C test2020_15.C test2020_16.C test2020_17.C \
-	test2020_18.C test2020_19.C test2020_20.C test2020_21.C \
-	test2020_22.C test2020_23.C test2020_24.C test2020_25.C \
-	test2020_26.C test2020_27.C test2020_28.C test2020_29.C \
-	test2020_30.C test2020_31.C test2020_32.C test2020_33.C \
-	test2020_34.C test2020_37.C test2020_38.C test2020_39.C \
-	test2020_40.C test2020_41.C test2020_42.C test2020_43.C \
-	test2020_44.C test2020_45.C test2020_46.C test2020_47.C \
-	test2020_49.C test2020_50.C test2020_51.C test2020_52.C \
-	test2020_53.C test2020_54.C test2020_55.C \
-	test_CplusplusMacro_Cpp.C test_int_lexemes.C \
-	test_int_lexemes_donot_pass.C test_simple_int.C test_wchars.C \
-	X.C $(am__append_2) $(am__append_4) $(am__append_6) \
+	test2017_61.C test2017_62.C test2017_64.C test2017_65.C \
+	test2017_66.C test2017_68.C test2017_70.C test2017_71.C \
+	test2017_72.C test2017_73.C test2017_74.C test2017_75.C \
+	test2017_76.C test2017_77.C test2017_78.C test2017_79.C \
+	test2017_80.C test2017_81.C test2017_82.C test2017_83.C \
+	test2017_84.C test2017_87.C test2017_88.C test2017_89.C \
+	test2017_90.C test2017_91.C test2017_92.C test2017_93.C \
+	test2017_94.C test2017_95.C test2017_96.C test2017_97.C \
+	test2017_98.C test2018_02.C test2018_03.C test2018_04.C \
+	test2018_05.C test2018_06.C test2018_07.C test2018_08.C \
+	test2018_09.C test2018_10.C test2018_11.C test2018_12.C \
+	test2018_13.C test2018_14.C test2018_15.C test2018_16.C \
+	test2018_17.C test2018_18.C test2018_19.C test2018_20.C \
+	test2018_21.C test2018_24.C test2018_27.C test2018_29.C \
+	test2018_30.C test2018_32.C test2018_33.C test2018_34.C \
+	test2018_35.C test2018_36.C test2018_37.C test2018_38.C \
+	test2018_39.C test2018_40.C test2018_41.C test2018_42.C \
+	test2018_43.C test2018_44.C test2018_45.C test2018_46.C \
+	test2018_47.C test2018_48.C test2018_49.C test2018_50.C \
+	test2018_51.C test2018_52.C test2018_53.C test2018_54.C \
+	test2018_55.C test2018_56.C test2018_57.C test2018_58.C \
+	test2018_59.C test2018_60.C test2018_61.C test2018_62.C \
+	test2018_63.C test2018_64.C test2019_01.C test2019_02.C \
+	test2019_03.C test2019_04.C test2019_05.C test2019_06.C \
+	test2019_07.C test2019_08.C test2019_09.C test2019_10.C \
+	test2019_11.C test2019_12.C test2019_13.C test2019_14.C \
+	test2019_15.C test2019_16.C test2019_17.C test2019_18.C \
+	test2019_19.C test2019_20.C test2019_21.C test2019_22.C \
+	test2019_23.C test2019_24.C test2020_01.C test2020_03.C \
+	test2020_04.C test2020_05.C test2020_06.C test2020_07.C \
+	test2020_08.C test2020_09.C test2020_10.C test2020_11.C \
+	test2020_12.C test2020_13.C test2020_14.C test2020_15.C \
+	test2020_16.C test2020_17.C test2020_18.C test2020_19.C \
+	test2020_20.C test2020_21.C test2020_22.C test2020_23.C \
+	test2020_24.C test2020_25.C test2020_26.C test2020_27.C \
+	test2020_28.C test2020_29.C test2020_30.C test2020_31.C \
+	test2020_32.C test2020_33.C test2020_34.C test2020_37.C \
+	test2020_38.C test2020_39.C test2020_40.C test2020_41.C \
+	test2020_42.C test2020_43.C test2020_44.C test2020_45.C \
+	test2020_46.C test2020_47.C test2020_49.C test2020_50.C \
+	test2020_51.C test2020_52.C test2020_53.C test2020_54.C \
+	test2020_55.C test2020_56.C test2020_57.C test2020_58.C \
+	test2020_59.C test2020_60.C test2020_61.C test2020_62.C \
+	test2020_63.C test2020_64.C test2020_65.C test2020_66.C \
+	test2020_67.C test2020_68.C test2020_69.C test2020_70.C \
+	test2020_71.C test2020_72.C test2020_73.C test2020_74.C \
+	test2020_75.C test2020_76.C test2020_77.C test2020_78.C \
+	test2020_79.C test2020_80.C test_CplusplusMacro_Cpp.C \
+	test_int_lexemes.C test_int_lexemes_donot_pass.C \
+	test_simple_int.C test_wchars.C X.C $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_10) $(am__append_13) \
-	$(am__append_15) $(am__append_16) $(am__append_19) \
-	$(am__append_21) $(am__append_23)
+	$(am__append_14) $(am__append_17) $(am__append_19) \
+	$(am__append_20) $(am__append_23) $(am__append_25) \
+	$(am__append_27) $(am__append_28) $(am__append_30)
 TESTCODE_CURRENTLY_FAILING = certSignalExample.C c++trick.C \
 	lexPhase2003_02.C longFile.C math.C \
 	restrict_template_parameter.C test2004_25.C test2004_35.C \
@@ -3423,10 +3474,10 @@ TESTCODE_CURRENTLY_FAILING = certSignalExample.C c++trick.C \
 	test2017_86.C test2017_99.C test2018_22.C test2018_23.C \
 	test2018_25.C test2018_26.C test2018_28.C test2018_31.C \
 	test2019_25.C test2020_35.C test2020_36.C test_gnu.C \
-	$(am__append_3) $(am__append_5) $(am__append_7) \
-	$(am__append_8) $(am__append_11) $(am__append_12) \
-	$(am__append_14) $(am__append_17) $(am__append_18) \
-	$(am__append_20) $(am__append_22)
+	$(am__append_6) $(am__append_8) $(am__append_11) \
+	$(am__append_12) $(am__append_15) $(am__append_16) \
+	$(am__append_18) $(am__append_21) $(am__append_22) \
+	$(am__append_24) $(am__append_26) $(am__append_29)
 @ROSE_USE_LONG_MAKE_CHECK_RULE_FALSE@TESTCODES_REQUIRED_TO_PASS = $(EXAMPLE_TESTCODES_REQUIRED_TO_PASS_SHORT)
 
 # Switch between full and short list of test codes
@@ -3466,7 +3517,7 @@ TEST_TRANSLATOR = ../../testTranslator
 #########
 # ROSE_FLAGS
 LANG_FLAGS = 
-ROSE_FLAGS = -std=c++ $(am__append_24) -w -rose:verbose 0 \
+ROSE_FLAGS = -std=c++ $(am__append_31) -w -rose:verbose 0 \
 	-rose:skip_unparse_asm_commands
 
 #
@@ -3490,7 +3541,7 @@ EXTRA_DIST = $(EXAMPLE_TESTCODES_REQUIRED_TO_PASS) $(TESTCODE_CURRENTLY_FAILING)
      test2006_187b.h test2007_08.h test2007_41.h  test2007_42.h test2007_47.h test2007_48.h test2007_97.h \
      test2007_101.h test2007_136.h test2007_137.h test2007_160.h test2007_160a.h test2007_167.h \
      test2008_11.h test2014_66.h test2014_112.h LogicalPath.cpp test2005_56.C test2010_25.h test2012_242.h test2012_268.h \
-     test2013_235.C test2013_236.C conftest.C conftest_2.C test2006_112.C test2010_25.C test2003_24.C \
+     test2013_235.C test2013_236.C conftest.C conftest_2.C conftest_3.C test2006_112.C test2010_25.C test2003_24.C \
      test2004_82.C test2014_130.h test2015_08.h test2015_29.h test2015_85.h \
      method-defn-in-tpldecl-1.h sgnodee.hpp test2006_136.h test2007_113.h test2007_114.h test2007_40.h test2012_178.h
 
@@ -3702,7 +3753,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -3718,6 +3768,17 @@ clean-test-targets:
 clean-local: clean-test-targets
 
 .PHONY: clean-test-targets
+
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@ # These are all just mising builtins
+
+#      EXAMPLE_TESTCODES_REQUIRED_TO_PASS += 
+#  EXAMPLE_TESTCODES_REQUIRED_TO_PASS += 
+
+# GNU compiler
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_TRUE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@      # skip these codes when using GNU 10.1 (testing)
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@      # DQ (7/23/2020): These are failing code for EDG 6.0 and GNU 10.1 (debugging this).
+#     EXAMPLE_TESTCODES_REQUIRED_TO_PASS += 
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@ # The test codes fail CLANG 10.0
 
 #########
 # Translator to be used: calling "make TEST_TRANSLATOR=../../testBackend" uses the backend compiler only
@@ -3818,13 +3879,17 @@ test_common_configure_test_with_link_part_1.passed: $(TEST_TRANSLATOR)
 
 # DQ (9/22/2013): Added autoconf style link test.
 test_common_configure_test_with_link_part_2.passed: $(TEST_TRANSLATOR)
-	@cp $(srcdir)/conftest_2.C conftest.C
-	@$(RTH_RUN) CMD="$(TEST_TRANSLATOR) $(LANG_FLAGS) $(ROSE_FLAGS) -I$(srcdir) conftest.C -o conftest_configure_test_part_2" $(top_srcdir)/scripts/test_exit_status $@
+# DQ (9/22/2020): Need to use a different filename so that these tests can run in parallel.
+#	@cp $(srcdir)/conftest_2.C conftest.C
+	@cp $(srcdir)/conftest_2.C conftest_2.C
+	@$(RTH_RUN) CMD="$(TEST_TRANSLATOR) $(LANG_FLAGS) $(ROSE_FLAGS) -I$(srcdir) conftest_2.C -o conftest_configure_test_part_2" $(top_srcdir)/scripts/test_exit_status $@
 
 # DQ (9/22/2013): Added autoconf style link test.
 test_common_configure_test_with_link_part_3.passed: $(TEST_TRANSLATOR)
-	@cp $(srcdir)/conftest_3.C conftest.C
-	@$(RTH_RUN) CMD="$(TEST_TRANSLATOR) $(LANG_FLAGS) $(ROSE_FLAGS) -I$(srcdir) conftest.C -o conftest_configure_test_part_3" $(top_srcdir)/scripts/test_exit_status $@
+# DQ (9/22/2020): Need to use a different filename so that these tests can run in parallel.
+#	@cp $(srcdir)/conftest_3.C conftest.C
+	@cp $(srcdir)/conftest_3.C conftest_3.C
+	@$(RTH_RUN) CMD="$(TEST_TRANSLATOR) $(LANG_FLAGS) $(ROSE_FLAGS) -I$(srcdir) conftest_3.C -o conftest_configure_test_part_3" $(top_srcdir)/scripts/test_exit_status $@
 
 # DQ (12/28/2015): Added test for new option to not normalize variable declarations.
 test_suppress_variable_declaration_normalization.passed: $(TEST_TRANSLATOR)
@@ -3977,6 +4042,8 @@ clean-local:
 	rm -f *.int.c
 	rm -f test2013_260_unparse_headers conftest_configure_test*
 	rm -f conftest.C
+	rm -f conftest_2.C
+	rm -f conftest_3.C
 	rm -f *.passed *.failed *.err
 	rm -f method-defn-in-tpldecl-0 method-defn-in-tpldecl-1
 

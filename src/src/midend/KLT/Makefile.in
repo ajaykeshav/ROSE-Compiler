@@ -757,7 +757,7 @@ top_builddir = @top_builddir@
 top_pwd = @top_pwd@
 top_srcdir = @top_srcdir@
 wine_path = @wine_path@
-SUBDIRS = include/KLT/Core include/KLT/DLX include/KLT/MDCG include/KLT/RTL lib/core lib/mdcg lib/rtl
+SUBDIRS = include/KLT/Core include/KLT/DLX include/KLT/MDCG include/KLT/RTL lib/core lib/mdcg # lib/rtl
 all: all-recursive
 
 .SUFFIXES:

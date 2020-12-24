@@ -118,14 +118,22 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 bin_PROGRAMS = rose-config$(EXEEXT) rose-compiler$(EXEEXT) \
 	$(am__EXEEXT_1) $(am__EXEEXT_2)
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_2 = $(top_srcdir)/src/3rdPartyLibraries/fortran-parser/iso_c_binding.rmod
-@ROSE_BUILD_ATERM_SUPPORT_TRUE@am__append_3 = $(top_srcdir)/src/3rdPartyLibraries/experimental-fortran-parser/share/rose/Fortran.tbl \
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_3 = $(top_srcdir)/src/3rdPartyLibraries/fortran-parser/iso_c_binding.rmod \
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@	$(top_srcdir)/src/3rdPartyLibraries/fortran-parser/openacc.rmod
+@ROSE_BUILD_ATERM_SUPPORT_TRUE@am__append_4 = $(top_srcdir)/src/3rdPartyLibraries/experimental-fortran-parser/share/rose/Fortran.tbl \
 @ROSE_BUILD_ATERM_SUPPORT_TRUE@	$(top_srcdir)/src/3rdPartyLibraries/experimental-fortran-parser/share/rose/CUDA_Fortran.tbl \
 @ROSE_BUILD_ATERM_SUPPORT_TRUE@	$(top_srcdir)/src/3rdPartyLibraries/experimental-jovial-parser/share/rose/Jovial.tbl
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@@ROSE_WITH_LIBHARU_TRUE@am__append_4 = \
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@@ROSE_WITH_LIBHARU_TRUE@am__append_5 = \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@@ROSE_WITH_LIBHARU_TRUE@   $(top_builddir)/src/3rdPartyLibraries/libharu-2.1.0/src/libhpdf.la
 
 
@@ -135,32 +143,37 @@ bin_PROGRAMS = rose-config$(EXEEXT) rose-compiler$(EXEEXT) \
 # Added this library to the libroseLibraries rule farther above in this file.
 
 # libelf is a prerequisite for using libdwarf
-@ROSE_HAVE_LIBELF_TRUE@am__append_5 = $(ROSE_ELF_LIBS_WITH_PATH)
+@ROSE_HAVE_LIBELF_TRUE@am__append_6 = $(ROSE_ELF_LIBS_WITH_PATH)
 
 # DQ (6/5/2010): Suggested change by Peter to support dwarf that would simplify use with Haskell
-@ROSE_HAVE_LIBDWARF_TRUE@am__append_6 = $(ROSE_DWARF_LIBS_WITH_PATH)
-@ROSE_USE_GCC_OMP_TRUE@am__append_7 = lgomp
+@ROSE_HAVE_LIBDWARF_TRUE@am__append_7 = $(ROSE_DWARF_LIBS_WITH_PATH)
+@ROSE_USE_GCC_OMP_TRUE@am__append_8 = lgomp
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_9 = -L${DOT_ASIS_LIB_DIR_} -ldot_asis 
 
 #librose_la_LDFLAGS = $(ROSE_DWARF_LIBS_WITH_PATH)
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#  librose_la_LDFLAGS += -R ${DOT_ASIS_LIB_DIR_} 
+#endif
 
 # DQ (4/12/2016): This is required for use with clang (not clear how to compile ROSE with out it).
 # librose_la_LIBADD += -lstdc++
 # librose_la_LIBADD += -lstdc++ -fno-rtti
-@USING_CLANG_COMPILER_TRUE@am__append_8 = -lstdc++
-@USING_CLANG_COMPILER_TRUE@am__append_9 = -fno-rtti
-@OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_TRUE@am__append_10 = -L$(PORT_HOME)/lib -lgcrypt
-@OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_FALSE@am__append_11 = 
-@OS_MACOSX_TRUE@am__append_12 = -Xlinker -rpath -Xlinker $(JAVA_JVM_PATH)
+@USING_CLANG_COMPILER_TRUE@am__append_10 = -lstdc++
+@USING_CLANG_COMPILER_TRUE@am__append_11 = -fno-rtti
+@OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_TRUE@am__append_12 = -L$(PORT_HOME)/lib -lgcrypt
+@OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_FALSE@am__append_13 = 
+@OS_MACOSX_TRUE@am__append_14 = -Xlinker -rpath -Xlinker $(JAVA_JVM_PATH)
 
 # DQ (4/12/2016): This is required for use with clang (not clear how to compile ROSE with out it).
-@USING_CLANG_COMPILER_TRUE@am__append_13 = -lstdc++
-@USING_CLANG_COMPILER_TRUE@am__append_14 = -fno-rtti
-@ROSE_USE_EDG_QUAD_FLOAT_TRUE@am__append_15 = -lquadmath
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@am__append_16 = rose-cc rose-c++
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_17 = rose-fortran
-@USING_CLANG_COMPILER_TRUE@am__append_18 = -lstdc++
-@USING_CLANG_COMPILER_TRUE@am__append_19 = -fno-rtti
-@OS_MACOSX_TRUE@am__append_20 = -Xlinker -rpath -Xlinker $(JAVA_JVM_PATH)
+@USING_CLANG_COMPILER_TRUE@am__append_15 = -lstdc++
+@USING_CLANG_COMPILER_TRUE@am__append_16 = -fno-rtti
+@ROSE_USE_EDG_QUAD_FLOAT_TRUE@am__append_17 = -lquadmath
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_18 = -L${DOT_ASIS_LIB_DIR_} -ldot_asis 
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@am__append_19 = rose-cc rose-c++
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_20 = rose-fortran
+@USING_CLANG_COMPILER_TRUE@am__append_21 = -lstdc++
+@USING_CLANG_COMPILER_TRUE@am__append_22 = -fno-rtti
+@OS_MACOSX_TRUE@am__append_23 = -Xlinker -rpath -Xlinker $(JAVA_JVM_PATH)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -339,8 +352,7 @@ am__DEPENDENCIES_1 =
 @ROSE_BUILD_PHP_LANGUAGE_SUPPORT_TRUE@am__DEPENDENCIES_8 = frontend/PHPFrontend/librosePHPFrontend.la
 @ROSE_BUILD_PYTHON_LANGUAGE_SUPPORT_TRUE@am__DEPENDENCIES_9 = frontend/PythonFrontend/librosePythonFrontend.la
 @ROSE_EXPERIMENTAL_CSHARP_ROSE_CONNECTION_TRUE@am__DEPENDENCIES_10 = frontend/Experimental_Csharp_ROSE_Connection/libexperimentalRoseCsharp.la
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__DEPENDENCIES_11 = frontend/Experimental_Ada_ROSE_Connection/libexperimentalRoseAda.la \
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@	${dot_asis_lib_dir}/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__DEPENDENCIES_11 = frontend/Experimental_Ada_ROSE_Connection/libexperimentalRoseAda.la
 @ROSE_EXPERIMENTAL_JOVIAL_ROSE_CONNECTION_TRUE@am__DEPENDENCIES_12 = frontend/Experimental_Jovial_ROSE_Connection/libexperimentalRoseJovial.la
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@am__DEPENDENCIES_13 = frontend/Experimental_Cobol_ROSE_Connection/libexperimentalRoseCobol.la
 @ROSE_USE_SQLITE_DATABASE_TRUE@am__DEPENDENCIES_14 = $(top_builddir)/src/roseExtensions/sqlite3x/libRoseSQLite3xDatabase.la
@@ -376,7 +388,7 @@ am__DEPENDENCIES_1 =
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(top_builddir)/src/roseExtensions/failSafe/libfailsafe.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__DEPENDENCIES_14) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__DEPENDENCIES_15) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_5)
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@am__DEPENDENCIES_16 = $(top_builddir)/src/3rdPartyLibraries/MSTL/libmstl.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/backend/libbackend.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/frontend/SageIII/libsage3.la \
@@ -388,7 +400,7 @@ am__DEPENDENCIES_1 =
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/util/libroseutil.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/util/libroseSaywer.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(libroseBinaryLibraries) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_5)
 @ROSE_USE_INTERNAL_JAVA_SUPPORT_TRUE@am__DEPENDENCIES_17 =  \
 @ROSE_USE_INTERNAL_JAVA_SUPPORT_TRUE@	$(am__DEPENDENCIES_1)
 @ROSE_USE_SQLITE_DATABASE_TRUE@am__DEPENDENCIES_18 =  \
@@ -433,10 +445,9 @@ am__DEPENDENCIES_27 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_25) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_26)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_26)
 am__DEPENDENCIES_28 = $(am__DEPENDENCIES_27) $(am__DEPENDENCIES_1)
 rose_c___LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -742,7 +753,7 @@ LD = @LD@
 
 # DQ (3/14/2009): In this file we have to overwrite existing values in LDFLAGS (to build librose.so).
 # DQ (3/14/2009): We have to clear the LDFLAGS variable...  This is not so great.
-LDFLAGS = $(am__append_10) $(am__append_11)
+LDFLAGS = $(am__append_12) $(am__append_13)
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
@@ -1121,10 +1132,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1232,8 +1243,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1515,9 +1527,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1552,27 +1568,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1623,7 +1628,7 @@ RTH_STATS = $(top_srcdir)/scripts/rth_stats.pl
 # Rasmussen (3/23/2018): Added installing libtool to the bin directory to support
 # linking an application using ROSE from a ROSE installations.
 bin_SCRIPTS = ../libtool
-pkgdata_DATA = $(am__append_2) $(am__append_3)
+pkgdata_DATA = $(am__append_3) $(am__append_4)
 MOSTLYCLEANFILES = rose-config.cfg
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@SUBDIRS = util ROSETTA roseSupport frontend midend backend \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@          3rdPartyLibraries roseIndependentSupport roseExtensions
@@ -1678,9 +1683,11 @@ AM_CPPFLAGS = -Winvalid-pch $(ROSE_INCLUDES)
 
 # DQ (28/8/2017): Adding more general language support.
 @ROSE_EXPERIMENTAL_CSHARP_ROSE_CONNECTION_TRUE@libroseCsharplibraries = frontend/Experimental_Csharp_ROSE_Connection/libexperimentalRoseCsharp.la
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_FALSE@libroseAdalibraries = 
 
-# DQ (28/8/2017): Adding more general language support.
+# DQ (31/8/2017): This library needs to be provided at configure time.
+#   DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
+#   DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#   dot_asis_lib_dir := $(DOT_ASIS_LIB_DIR_)
 
 # DQ (31/8/2017): At least the Asis library needs to be provided built in to GNAT (atypical installation of GNAT).
 #  asis_lib_dir = @gnat_home@/lib/asis/asislib
@@ -1691,9 +1698,12 @@ AM_CPPFLAGS = -Winvalid-pch $(ROSE_INCLUDES)
 # libroseAdalibraries += ${dot_asis_lib_dir}/libdot_asis.a ${asis_lib_dir}/libasis.a ${gnat_lib_dir}/libgnarl.a ${gnat_lib_dir}/libgnat.a
 #  libroseAdalibraries += ${dot_asis_lib_dir}/libdot_asis.so
 #  libroseAdalibraries += -Wl,-rpath -Wl,${dot_asis_lib_dir}/libdot_asis.so
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@libroseAdalibraries = frontend/Experimental_Ada_ROSE_Connection/libexperimentalRoseAda.la \
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@	${dot_asis_lib_dir}/libdot_asis.so
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@dot_asis_lib_dir := $(DOT_ASIS_LIB_DIR_)
+#   libroseAdalibraries += ${dot_asis_lib_dir}/libdot_asis.so
+# Ada is not enabled
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_FALSE@libroseAdalibraries = 
+
+# DQ (28/8/2017): Adding more general language support.
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@libroseAdalibraries = frontend/Experimental_Ada_ROSE_Connection/libexperimentalRoseAda.la
 @ROSE_EXPERIMENTAL_JOVIAL_ROSE_CONNECTION_FALSE@libroseJoviallibraries = 
 
 # DQ (28/8/2017): Adding more general language support.
@@ -1766,7 +1776,7 @@ libroseX10Libraries = frontend/X10_ROSE_Connection/libroseX10.la
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(top_builddir)/src/roseExtensions/failSafe/libfailsafe.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(libroseSqlite3xConnection) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(libroseQtExtension) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_5)
 
 # TOO (11/22/2011): flattening midend Makefiles => TODO: move conditional compilation to Makefile.
 # TODO: correct list!
@@ -1781,7 +1791,7 @@ libroseX10Libraries = frontend/X10_ROSE_Connection/libroseX10.la
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/util/libroseutil.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(top_builddir)/src/util/libroseSaywer.la \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(libroseBinaryLibraries) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_5)
 
 # DQ (6/10/2017): Added libhpdf.la library and removed it from LIBADD rule.
 # This is being done to fix the "make install" rule (which failes for me).
@@ -1849,10 +1859,11 @@ librose_la_SOURCES = dummyCppFileForLibrose.C
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(ROSE_ATERM_LIBS) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(ROSE_FLANG_LIBS) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_5) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_6) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_7) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_8)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_8) \
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_9) \
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_10)
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@librose_la_LIBADD =  \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(BOOST_LDFLAGS) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(libroseLibraries) \
@@ -1868,13 +1879,13 @@ librose_la_SOURCES = dummyCppFileForLibrose.C
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(BOOST_SERIALIZATION_LIB) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(BOOST_WAVE_LIB) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(BOOST_IOSTREAMS_LIB) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_5) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_6) \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_7) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_8)
-
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_8) \
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_9) \
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_10)
 # librose_la_LDFLAGS = -no-undefined --rpath $(INTEL_PIN_PATH)/intel64/lib-ext
-librose_la_LDFLAGS = -no-undefined $(ROSE_RPATHS) $(am__append_9) \
+librose_la_LDFLAGS = -no-undefined $(ROSE_RPATHS) $(am__append_11) \
 	-fno-rtti
 librose_la_DEPENDENCIES = $(libroseLibraries)
 
@@ -1888,11 +1899,11 @@ REQUIRED_LIBS = librose.la
 @OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_TRUE@PORT_PATH = $(shell which port)
 @OS_MACOSX_TRUE@@ROSE_HAVE_LIBGCRYPT_TRUE@PORT_HOME = $(shell dirname $(PORT_PATH))/..
 rose_config_SOURCES = rose-config.C
-rose_config_LDFLAGS = $(ROSE_RPATHS) $(am__append_12) $(am__append_14) \
+rose_config_LDFLAGS = $(ROSE_RPATHS) $(am__append_14) $(am__append_16) \
 	-fno-rtti
 rose_config_DEPENDENCIES = $(REQUIRED_LIBS)
 rose_config_CPPFLAGS = -DLIBDIR='"$(libdir)"'
-rose_config_LDADD = $(ROSE_LIBS) $(am__append_13)
+rose_config_LDADD = $(ROSE_LIBS) $(am__append_15)
 rose_config_installed_cppflags = \
 	-I@includedir@/rose			\
 	$(ROSE_QT_INCLUDE)			\
@@ -1929,7 +1940,8 @@ rose_config_installed_ldflags = -L@libdir@ -lrose $(BOOST_LDFLAGS) \
 	$(ROSE_FLANG_LIBS) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
 	$(ROSE_YAML_LIBS_WITH_PATH) $(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_DLIB_LIBS_WITH_PATH) $(ROSE_GCRYPT_LIBS_WITH_PATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) -lm $(am__append_15)
+	$(ROSE_CAPSTONE_LIBS_WITH_PATH) -lm $(am__append_17) \
+	$(am__append_18)
 rose_config_cfgdir = $(libdir)
 rose_config_cfg_DATA = rose-config.cfg
 # The -std= option in ROSE only support c, c++, fortran
@@ -1942,9 +1954,9 @@ rose_config_cfg_DATA = rose-config.cfg
 #if ROSE_EXPERIMENTAL_JOVIAL_ROSE_CONNECTION
 #if ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION
 #if ROSE_EXPERIMENTAL_MATLAB_ROSE_CONNECTION
-ROSEBIN_LDADD = $(ROSE_LIBS) $(am__append_18)
-ROSEBIN_LDFLAGS = $(ROSE_RPATHS) $(am__append_19) -fno-rtti \
-	$(am__append_20)
+ROSEBIN_LDADD = $(ROSE_LIBS) $(am__append_21)
+ROSEBIN_LDFLAGS = $(ROSE_RPATHS) $(am__append_22) -fno-rtti \
+	$(am__append_23)
 ROSEBIN_DEPENDENCIES = $(REQUIRED_LIBS)
 rose_compiler_SOURCES = rose-compiler.C
 rose_compiler_LDFLAGS = $(ROSEBIN_LDFLAGS)
@@ -2563,7 +2575,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -2579,9 +2590,6 @@ clean-test-targets:
 clean-local: clean-test-targets
 
 .PHONY: clean-test-targets
-
-# DQ (31/8/2017): This library needs to be provided at configure time.
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@   DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 ########################################################################################################################
 

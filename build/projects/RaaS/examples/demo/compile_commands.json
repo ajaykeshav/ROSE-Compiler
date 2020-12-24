@@ -1,0 +1,11 @@
+[
+  {
+    "directory" : "/home/meltdown1995/roseRoot/rose-compiler/build/projects/RaaS/examples/demo",
+    "file"      : "/home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo/demo-0.c",
+    "command"   : "c++ -I/home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo -c /home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo/demo-0.c"
+  },{
+    "directory" : "/home/meltdown1995/roseRoot/rose-compiler/build/projects/RaaS/examples/demo",
+    "file"      : "/home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo/demo-1.c",
+    "command"   : "c++ -I/home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo -c /home/meltdown1995/roseRoot/rose-compiler//src/projects/RaaS/examples/demo/demo-1.c"
+  }
+]

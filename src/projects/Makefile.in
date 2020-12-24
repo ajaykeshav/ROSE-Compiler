@@ -113,8 +113,15 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@am__append_2 = \
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+@ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@am__append_3 = \
 @ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@    ShiftCalculus4 \
 @ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@    dsl_infrastructure \
 @ROSE_USING_GCC_VERSION_LATER_4_8_TRUE@    arrayDSLcompiler \
@@ -129,10 +136,10 @@ host_triplet = @host@
 
 # TOO (2/16/2011): Errors with Tensilica's Xtensa compilers as alternative backend compilers. We can
 # gradually enable these tests at a later stage if necessary.
-@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_3 = autoTuning
+@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_4 = autoTuning
 
 # DQ (7/21/2010): Removed RTED since it is a problem to compile with ROSE (projects/RTED/CppRuntimeSystem/test.cpp).
-@ROSE_USING_ROSE_ANALYSIS_FALSE@am__append_4 = RTED
+@ROSE_USING_ROSE_ANALYSIS_FALSE@am__append_5 = RTED
 
 # DQ (2/12/2010): compass appears to be a problem for the code generation support
 # in ROSE, so lets' move on and return to compass later for this level of support
@@ -142,7 +149,7 @@ host_triplet = @host@
 # DQ (10/17/2010): This seems to be problem for Java, we can fix this later.
 
 # DQ (4/17/2016): Restrict this to requiring both C/C++ language support and Binary analysis support.
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_JAVA_LANGUAGE_SUPPORT_FALSE@@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_5 = compass \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_JAVA_LANGUAGE_SUPPORT_FALSE@@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_6 = compass \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_BUILD_JAVA_LANGUAGE_SUPPORT_FALSE@@ROSE_USING_ROSE_CODE_GENERATION_FALSE@	palette
 
 # Disable the use of the interpreter except on GNU 4.2
@@ -153,11 +160,11 @@ host_triplet = @host@
 # compiler errors).
 
 # DQ (4/8/2011): Directories of tests are a current problem for Insure++.
-@OLD_COMPILER_VERSION_FALSE@@ROSE_USE_INSURE_FALSE@@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_6 = interpreter
+@OLD_COMPILER_VERSION_FALSE@@ROSE_USE_INSURE_FALSE@@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_7 = interpreter
 
 # Pei-Hung (12/17/2014): adding PolyOpt only when POCC is available
 # Pei-Hung (09/24/2015): MultiLevelMemory requires POCC
-@ROSE_WITH_POCC_TRUE@am__append_7 = PolyOpt2
+@ROSE_WITH_POCC_TRUE@am__append_8 = PolyOpt2
 subdir = projects
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -926,10 +933,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1037,8 +1044,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1320,9 +1328,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1357,27 +1369,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1445,9 +1446,9 @@ SUBDIRS = ArithmeticMeasureTool POET_ROSE BinaryCloneDetection \
 	UpcTranslation autoParallelization pragmaParsing \
 	ManyCoreRuntime Fortran_to_C extractMPISkeleton \
 	RoseBlockLevelTracing xgenTranslator TemplateAnalysis \
-	$(OPTIONAL_PROJECTS) $(am__append_2) $(am__append_3) \
-	$(am__append_4) simulator2 $(am__append_5) $(am__append_6) \
-	$(am__append_7) TileK RaaS CompilationDB
+	$(OPTIONAL_PROJECTS) $(am__append_3) $(am__append_4) \
+	$(am__append_5) simulator2 $(am__append_6) $(am__append_7) \
+	$(am__append_8) TileK RaaS CompilationDB
 
 ########################################################################################################################
 # Associate projects with developers
@@ -1786,7 +1787,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

@@ -124,7 +124,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
 
@@ -230,7 +237,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 ###############################################################################################################################
 # Tests reading past the end-of-file
 ###############################################################################################################################
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_2 =  \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_3 =  \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	conditionalDisable \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	isA64Disabled \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testSymbolicExprParser \
@@ -252,7 +259,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testAstNeuter \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testRegisters \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testReadPastEOF
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_3 = testSymbolicExprParser.passed \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_4 = testSymbolicExprParser.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(testControlFlow_targets) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testFunctionCall-A.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testFunctionCall-B.passed \
@@ -275,7 +282,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testAstNeuter.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testRegisters.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testReadPastEOF.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_4 = $(testControlFlow_answers) \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_5 = $(testControlFlow_answers) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testFunctionCall-A.ans \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testFunctionCall-B.ans \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testElfByteOrder.conf \
@@ -333,7 +340,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 # Do not run these tests automatically by "make check" because LLVM is not always installed.  Therefore, we
 # also need to mention the outputs in MOSTLYCLEANFILES.
 #TEST_TARGETS += $(llvmAnalysis_TestTargets)
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_5 =  \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_6 =  \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testAstNeuter.ast \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(llvmAnalysis_TestTargets) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(llvmAnalysis_TestTargets:.passed=.failed)
@@ -341,8 +348,8 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 ###############################################################################################################################
 # Not sure what this does.
 ###############################################################################################################################
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_USE_SQLITE_DATABASE_TRUE@am__append_6 = testLibraryDb
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_USE_SQLITE_DATABASE_TRUE@am__append_7 = testLibraryDb.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_USE_SQLITE_DATABASE_TRUE@am__append_7 = testLibraryDb
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_USE_SQLITE_DATABASE_TRUE@am__append_8 = testLibraryDb.passed
 
 ###############################################################################################################################
 # Tests reading import sections from PE files
@@ -383,14 +390,14 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 ###############################################################################################################################
 # Test the WorkList class
 ###############################################################################################################################
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_8 = testPeImports \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_9 = testPeImports \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory002 cory003 \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory004 cory006 \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory007 cory008 \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory009 \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testSymReadWrite \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testWorkList
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_9 =  \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_10 =  \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testPeImports.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory003.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	cory004.passed \
@@ -406,8 +413,8 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 ###############################################################################################################################
 
 # DQ (11/17/2017): The testMap.C code causes an internal compiler error for the Intel v16 compiler.
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_10 = testMap
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_11 = testMap.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_11 = testMap
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_12 = testMap.passed
 
 ###############################################################################################################################
 # Test pointer detection
@@ -543,7 +550,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 ########################################################################################################################
 # Test disassembler
 ########################################################################################################################
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_12 =  \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_13 =  \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testPointerDetection \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testCallDetection \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testReturnsValue \
@@ -584,7 +591,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 # Unit tests for use-def (executed created below)
 ###############################################################################################################################
 # Uses "symbolicSemantics2" executable compiled in another test.
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_13 = testPointerDetection.passed \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_14 = testPointerDetection.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testCallDetection.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testReturnsValue.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	usedef.passed \
@@ -617,7 +624,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 #-------------- all LLVM-specific tests
 
 #--------------------------------------------------------------------------------
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_14 = check-testPartitioner2 \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_15 = check-testPartitioner2 \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check-testDominance \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check-semantics \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check-llvm-xcode \
@@ -629,11 +636,11 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check_astio \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check_specimens \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	check-random-input
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_YICES_TRUE@am__append_15 = yicesSemanticsExe2-x86.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBYICES_TRUE@am__append_16 = yicesSemanticsLib2-x86.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_Z3_TRUE@am__append_17 = z3SemanticsExe2-x86.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBZ3_TRUE@am__append_18 = z3SemanticsLib2-x86.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_19 = semanticsSubclassing.passed \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_YICES_TRUE@am__append_16 = yicesSemanticsExe2-x86.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBYICES_TRUE@am__append_17 = yicesSemanticsLib2-x86.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_Z3_TRUE@am__append_18 = z3SemanticsExe2-x86.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBZ3_TRUE@am__append_19 = z3SemanticsLib2-x86.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_20 = semanticsSubclassing.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(llvmTranscoder_TestTargets) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(taintedFlow_TestTargets) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(testNoop_TestTargets) \
@@ -645,9 +652,9 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	test_small_pdf_generation.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	test_large_pdf_generation.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testSymbolicSubstitution.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_Z3_TRUE@am__append_20 = testSmtWideConstant-z3exe.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBZ3_TRUE@am__append_21 = testSmtWideConstant-z3lib.passed
-@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_22 = testPeekRegister.passed \
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_Z3_TRUE@am__append_21 = testSmtWideConstant-z3exe.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@@ROSE_HAVE_LIBZ3_TRUE@am__append_22 = testSmtWideConstant-z3lib.passed
+@ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@am__append_23 = testPeekRegister.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testDataBlockOwnership.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testSRecords.passed \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	testDisassembler-ppc32.passed \
@@ -888,10 +895,9 @@ am__DEPENDENCIES_8 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_7)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_7)
 am__DEPENDENCIES_9 = $(am__DEPENDENCIES_8)
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@cfg2_DEPENDENCIES = $(am__DEPENDENCIES_9) \
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@	$(am__DEPENDENCIES_9) \
@@ -2028,10 +2034,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -2139,8 +2145,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -2422,9 +2429,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -2459,27 +2470,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -3490,16 +3490,16 @@ nonsmoke_specimens_binary_any_any_any =  \
 SUBDIRS = libraryIdentification_tests Dwarf_tests Pin_tests Concolic
 EXTRA_DIST = runExecFormatsTest testShiftResizeSection.sh \
 	testSampleBinary.sh testSampleBinaries.conf \
-	testFunctionDetection.pl $(am__append_4)
+	testFunctionDetection.pl $(am__append_5)
 
 # Forward declarations
-TEST_TARGETS = $(am__append_3) $(am__append_7) $(am__append_9) \
-	$(am__append_11) $(am__append_13) $(am__append_15) \
-	$(am__append_16) $(am__append_17) $(am__append_18) \
-	$(am__append_19) $(am__append_20) $(am__append_21) \
-	$(am__append_22)
-MOSTLYCLEANFILES = $(am__append_5)
-PHONIES = $(am__append_14)
+TEST_TARGETS = $(am__append_4) $(am__append_8) $(am__append_10) \
+	$(am__append_12) $(am__append_14) $(am__append_16) \
+	$(am__append_17) $(am__append_18) $(am__append_19) \
+	$(am__append_20) $(am__append_21) $(am__append_22) \
+	$(am__append_23)
+MOSTLYCLEANFILES = $(am__append_6)
+PHONIES = $(am__append_15)
 
 # Location of binary specimens
 @ROSE_BUILD_BINARY_ANALYSIS_SUPPORT_TRUE@SPECIMEN_DIR = $(nonsmoke_specimens_binary_directory)
@@ -4573,7 +4573,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

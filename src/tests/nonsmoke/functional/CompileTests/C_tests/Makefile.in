@@ -113,10 +113,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 
 # DQ (1/16/2017): Clang C support appears to be missign the typeof operator (C11 mode).
-@USING_CLANG_COMPILER_FALSE@am__append_2 = \
+@USING_CLANG_COMPILER_FALSE@am__append_3 = \
 @USING_CLANG_COMPILER_FALSE@     test2010_12.c \
 @USING_CLANG_COMPILER_FALSE@     test2012_14.c \
 @USING_CLANG_COMPILER_FALSE@     test2012_25.c \
@@ -184,10 +191,11 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_FALSE@     test2015_147.c \
 @USING_CLANG_COMPILER_FALSE@     test2015_148.c \
 @USING_CLANG_COMPILER_FALSE@     test2015_149.c \
+@USING_CLANG_COMPILER_FALSE@     test2018_08.c \
 @USING_CLANG_COMPILER_FALSE@     test2004_21.c \
 @USING_CLANG_COMPILER_FALSE@     test2006_65.c
 
-@USING_CLANG_COMPILER_FALSE@am__append_3 = \
+@USING_CLANG_COMPILER_FALSE@am__append_4 = \
 @USING_CLANG_COMPILER_FALSE@     test2006_132.c \
 @USING_CLANG_COMPILER_FALSE@     test2010_04.c \
 @USING_CLANG_COMPILER_FALSE@     test2006_14.c  \
@@ -199,7 +207,7 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_FALSE@     test2011_04.c \
 @USING_CLANG_COMPILER_FALSE@     Yarden_client.c
 
-@USING_CLANG_COMPILER_TRUE@am__append_4 = \
+@USING_CLANG_COMPILER_TRUE@am__append_5 = \
 @USING_CLANG_COMPILER_TRUE@     test2010_12.c \
 @USING_CLANG_COMPILER_TRUE@     test2012_14.c \
 @USING_CLANG_COMPILER_TRUE@     test2012_25.c \
@@ -268,7 +276,7 @@ host_triplet = @host@
 @USING_CLANG_COMPILER_TRUE@     test2015_148.c \
 @USING_CLANG_COMPILER_TRUE@     test2015_149.c 
 
-@USING_CLANG_COMPILER_TRUE@am__append_5 = \
+@USING_CLANG_COMPILER_TRUE@am__append_6 = \
 @USING_CLANG_COMPILER_TRUE@     test2006_132.c \
 @USING_CLANG_COMPILER_TRUE@     test2010_04.c \
 @USING_CLANG_COMPILER_TRUE@     test2006_14.c  \
@@ -299,10 +307,10 @@ host_triplet = @host@
 #    test2015_103.c (demonstrates unparsing of CPP directive before closing ";" of expanded macro)
 #    test2015_105.c (demonstrates unparsing of __asm__() in wrong position)
 #    test2015_106.c (demonstrated use of volatile with va_list (not allowed)
-@OS_VENDOR_REDHAT_REL5_TRUE@am__append_6 = test2012_173.c
-@OS_VENDOR_REDHAT_REL5_FALSE@am__append_7 = test2012_173.c
-@OS_VENDOR_REDHAT_REL6_TRUE@am__append_8 = test2012_173_redhat_rel6.c
-@OS_VENDOR_REDHAT_REL6_FALSE@am__append_9 = test2012_173_redhat_rel6.c
+@OS_VENDOR_REDHAT_REL5_TRUE@am__append_7 = test2012_173.c
+@OS_VENDOR_REDHAT_REL5_FALSE@am__append_8 = test2012_173.c
+@OS_VENDOR_REDHAT_REL6_TRUE@am__append_9 = test2012_173_redhat_rel6.c
+@OS_VENDOR_REDHAT_REL6_FALSE@am__append_10 = test2012_173_redhat_rel6.c
 
 # DQ (1/5/2014): Some failing test codes:
 #     test2014_03.c  (demonstrates nested functions (not supported in EDG))
@@ -329,7 +337,7 @@ host_triplet = @host@
 # DQ (9/26/2009): Conditionally compile this file (fails in OSX due to lack of OSX
 # support for thread local storage). Liao know more about the details of this test.
 # test2009_19.c
-@OS_MACOSX_FALSE@am__append_10 = \
+@OS_MACOSX_FALSE@am__append_11 = \
 @OS_MACOSX_FALSE@      test2009_19.c \
 @OS_MACOSX_FALSE@      test2012_10.c \
 @OS_MACOSX_FALSE@      test2012_12.c \
@@ -350,7 +358,7 @@ host_triplet = @host@
 @OS_MACOSX_FALSE@      test2015_34.c \
 @OS_MACOSX_FALSE@      test2012_09.c
 
-@OS_MACOSX_TRUE@am__append_11 = \
+@OS_MACOSX_TRUE@am__append_12 = \
 @OS_MACOSX_TRUE@      test2009_19.c \
 @OS_MACOSX_TRUE@      test2012_10.c \
 @OS_MACOSX_TRUE@      test2012_12.c \
@@ -371,12 +379,12 @@ host_triplet = @host@
 @OS_MACOSX_TRUE@      test2015_34.c \
 @OS_MACOSX_TRUE@      test2012_09.c
 
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_12 = \
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_13 = \
 @ROSE_USE_CLANG_FRONTEND_FALSE@     test2009_05.c \
 @ROSE_USE_CLANG_FRONTEND_FALSE@     test2009_17.c
 
 check_PROGRAMS = $(am__EXEEXT_4)
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_13 = --edg:no_warnings --edg:restrict
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_14 = --edg:no_warnings --edg:restrict
 subdir = tests/nonsmoke/functional/CompileTests/C_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -1333,10 +1341,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1444,8 +1452,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1727,9 +1736,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1764,27 +1777,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1961,35 +1963,35 @@ TESTCODES_REQUIRED_TO_PASS = test2020_03.c test_CplusplusMacro_C.c \
 	test2017_18.c test2017_19.c test2017_20.c test2017_21.c \
 	test2017_22.c test2017_23.c test2017_24.c test2017_25.c \
 	test2018_01.c test2018_02.c test2018_03.c test2018_04.c \
-	test2018_05.c test2018_06.c test2018_07.c test2018_08.c \
-	test2018_09.c test2018_10.c test2018_11.c test2018_12.c \
-	test2018_13.c test2018_14.c test2018_15.c test2018_16.c \
-	test2018_17.c test2018_18.c test2018_19.c test2018_20.c \
-	test2018_21.c test2018_22.c test2018_23.c test2018_24.c \
-	test2018_25.c test2018_28.c test2018_29.c test2018_30.c \
-	test2018_31.c test2018_32.c test2018_33.c test2018_35.c \
-	test2018_36.c test2018_37.c test2018_41.c test2018_42.c \
-	test2018_43.c test2018_44.c test2018_62.c test2018_63.c \
-	test2018_64.c test2018_67.c rose-1391-a.c rose-1391-b.c \
-	test2019_01.c test2019_02.c test2019_03.c test2019_04.c \
-	test2019_05.c test2019_06.c test2019_07.c test2019_08.c \
-	test2019_09.c test2019_10.c test2019_11.c test2019_12.c \
-	test2019_13.c test2019_14.c test2019_15.c test2020_12.c \
-	test2020_13.c test2020_14.c test2020_15.c test2020_16.c \
-	test2020_17.c test2020_18.c test2020_19.c test2020_21.c \
-	test2020_22.c test2020_24.c test2020_28.c test2020_29.c \
-	test2020_30.c test2020_31.c test2020_32.c test2020_33.c \
-	test2020_34.c test2020_35.c test2020_36.c test2020_37.c \
-	$(am__append_2) $(am__append_5) $(am__append_6) \
-	$(am__append_8) $(am__append_10)
+	test2018_05.c test2018_06.c test2018_07.c test2018_09.c \
+	test2018_10.c test2018_11.c test2018_12.c test2018_13.c \
+	test2018_14.c test2018_15.c test2018_16.c test2018_17.c \
+	test2018_18.c test2018_19.c test2018_20.c test2018_21.c \
+	test2018_22.c test2018_23.c test2018_24.c test2018_25.c \
+	test2018_28.c test2018_29.c test2018_30.c test2018_31.c \
+	test2018_32.c test2018_33.c test2018_35.c test2018_36.c \
+	test2018_37.c test2018_41.c test2018_42.c test2018_43.c \
+	test2018_44.c test2018_62.c test2018_63.c test2018_64.c \
+	test2018_67.c rose-1391-a.c rose-1391-b.c test2019_01.c \
+	test2019_02.c test2019_03.c test2019_04.c test2019_05.c \
+	test2019_06.c test2019_07.c test2019_08.c test2019_09.c \
+	test2019_10.c test2019_11.c test2019_12.c test2019_13.c \
+	test2019_14.c test2019_15.c test2020_12.c test2020_13.c \
+	test2020_14.c test2020_15.c test2020_16.c test2020_17.c \
+	test2020_18.c test2020_19.c test2020_21.c test2020_22.c \
+	test2020_24.c test2020_28.c test2020_29.c test2020_30.c \
+	test2020_31.c test2020_32.c test2020_33.c test2020_34.c \
+	test2020_35.c test2020_36.c test2020_37.c test2020_38.c \
+	test2020_39.c test2020_40.c $(am__append_3) $(am__append_6) \
+	$(am__append_7) $(am__append_9) $(am__append_11)
 TESTCODE_CURRENTLY_FAILING = test2004_126.c test2006_134.c \
 	test2009_06.c test2010_05.c test2010_16.c test2017_02.c \
 	test2017_03.c test2017_05.c test2017_16.c test2018_26.c \
 	test2018_27.c test2018_34.c test2018_38.c test2018_39.c \
 	test2018_40.c test2020_20.c test2020_23.c test2020_25.c \
-	test2020_26.c test2020_27.c $(am__append_3) $(am__append_4) \
-	$(FAILING_TESTCODES_XEN) $(am__append_7) $(am__append_9) \
-	$(FILES_NOT_PASSING) $(am__append_11) test2005_168.c
+	test2020_26.c test2020_27.c $(am__append_4) $(am__append_5) \
+	$(FAILING_TESTCODES_XEN) $(am__append_8) $(am__append_10) \
+	$(FILES_NOT_PASSING) $(am__append_12) test2005_168.c
 
 # DQ (4/11/2015): New failing tests:
 FAILING_TESTCODES_XEN = \
@@ -2045,7 +2047,7 @@ FILES_NOT_PASSING = \
 #Liao, 5/16/2009 add a set of self-verifiable test code with main() 
 # and let them run during make check
 # TV, 9/7/12 do not run them if using Clang
-TESTCODES_REQUIRED_TO_RUN = $(am__append_12)
+TESTCODES_REQUIRED_TO_RUN = $(am__append_13)
 
 # Automake's testing mechanism (which defines the "make check" rule) requires passing tests.
 TESTCODES = $(TESTCODES_REQUIRED_TO_PASS)
@@ -2081,7 +2083,7 @@ TEST_TRANSLATOR = ../../testTranslator
 #########
 # ROSE_FLAGS
 LANG_FLAGS = 
-ROSE_FLAGS = -std=c $(am__append_13) -w -rose:verbose 0
+ROSE_FLAGS = -std=c $(am__append_14) -w -rose:verbose 0
 EXTRA_DIST = $(ALL_TESTCODES) builtin-types.def callee.c caller.c c-common.def \
              predict.def test2009_18.c test2009_20.c test2014_20_inc.c test2014_27_inc.c test2014_28_inc.c \
 	     conftest.c test2005_168.c \
@@ -2590,7 +2592,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

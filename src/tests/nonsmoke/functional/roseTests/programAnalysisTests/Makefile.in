@@ -133,7 +133,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 noinst_PROGRAMS = CFGTest$(EXEEXT) DataFlowTest$(EXEEXT) \
 	StmtRefTest$(EXEEXT) PtrAnalTest$(EXEEXT) \
 	steensgaardTest1$(EXEEXT) steensgaardTest2$(EXEEXT) \
@@ -142,33 +149,33 @@ noinst_PROGRAMS = CFGTest$(EXEEXT) DataFlowTest$(EXEEXT) \
 
 # DQ (4/4/2017): Note that Boost 1.62 version is problematic and Boost suggests using an older version.
 # There is nothing that ROSE can do about this except skip some tests that require problem features of Boost 1.62.
-@ROSE_USING_BOOST_VERSION_1_62_FALSE@am__append_2 = staticInterproceduralSlicingTests   \
+@ROSE_USING_BOOST_VERSION_1_62_FALSE@am__append_3 = staticInterproceduralSlicingTests   \
 @ROSE_USING_BOOST_VERSION_1_62_FALSE@        ssa_UnfilteredCfg_Test                 \
 @ROSE_USING_BOOST_VERSION_1_62_FALSE@	staticSingleAssignmentTests
 
-@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_3 = CFGTest.C
+@ROSE_USING_ROSE_CODE_GENERATION_FALSE@am__append_4 = CFGTest.C
 
 #	@echo "USING_GCC_COMPILER == true"
 #	@echo "ROSE_USING_GCC_VERSION_LATER_4_9 == true"
 # Exclude these tests on GNU 4.9 and later compilers).
 #	@echo "ROSE_USING_GCC_VERSION_LATER_4_9 == true"
-@ROSE_USING_GCC_VERSION_LATER_4_9_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_GNU_COMPILER_TRUE@am__append_4 = $(EDG_49_CLANG_PROBLEM_FILES)
-@ROSE_USING_GCC_VERSION_LATER_4_9_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@@USING_GNU_COMPILER_TRUE@am__append_5 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES) $(EDG_49_CLANG_PROBLEM_FILES)
+@ROSE_USING_GCC_VERSION_LATER_4_9_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_GNU_COMPILER_TRUE@am__append_5 = $(EDG_49_CLANG_PROBLEM_FILES)
+@ROSE_USING_GCC_VERSION_LATER_4_9_TRUE@@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@@USING_GNU_COMPILER_TRUE@am__append_6 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES) $(EDG_49_CLANG_PROBLEM_FILES)
 # If this is not the CLANG or Intel compilers and an earlier version of GNU than GNU 4.9 compiler, so include these files.
 #	@echo "ROSE_USING_GCC_VERSION_LATER_4_9 == false"
-@ROSE_USING_GCC_VERSION_LATER_4_9_FALSE@@USING_GNU_COMPILER_TRUE@am__append_6 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES) $(EDG_49_CLANG_PROBLEM_FILES)
+@ROSE_USING_GCC_VERSION_LATER_4_9_FALSE@@USING_GNU_COMPILER_TRUE@am__append_7 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES) $(EDG_49_CLANG_PROBLEM_FILES)
 #	@echo "USING_GCC_COMPILER == false"
 # Exclude this list of files in the case of CLANG compiler.
 #	@echo "USING_CLANG_COMPILER == true"
-@USING_CLANG_COMPILER_TRUE@@USING_GNU_COMPILER_FALSE@am__append_7 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES)
+@USING_CLANG_COMPILER_TRUE@@USING_GNU_COMPILER_FALSE@am__append_8 = $(EDG_412_GNU_6_1_PROBLEM_FILES) $(EDG_49_GNU_6_1_PROBLEM_FILES)
 
 # DQ (4/17/2016): This test code is a problem for Clang.
-@USING_CLANG_COMPILER_FALSE@am__append_8 = \
+@USING_CLANG_COMPILER_FALSE@am__append_9 = \
 @USING_CLANG_COMPILER_FALSE@   test2006_02.C 
 
 
 # DQ (1/19/2017): These test codes fails for GNU 6.1 in the staticCFG_tests directory.
-@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_9 = \
+@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_10 = \
 @ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@ inputBug317.C \
 @ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@ inputBug327.C \
 @ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@ test2004_35.C \
@@ -211,7 +218,7 @@ noinst_PROGRAMS = CFGTest$(EXEEXT) DataFlowTest$(EXEEXT) \
 
 
 # DQ (1/19/2017): This test code fails for GNU 6.1 in the staticCFG_tests directory.
-@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_10 = \
+@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@am__append_11 = \
 @ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@ test2011_121.C 
 
 
@@ -273,7 +280,7 @@ noinst_PROGRAMS = CFGTest$(EXEEXT) DataFlowTest$(EXEEXT) \
 # EXAMPLE_TESTCODES_REQUIRED_TO_PASS = $NAME_QUALIFICATION_EXAMPLE_TESTCODES_REQUIRED_TO_PASS + $EXAMPLE_TESTCODES_REQUIRED_TO_PASS
 
 # This test code fails with Insure++
-@ROSE_USE_INSURE_FALSE@am__append_11 = \
+@ROSE_USE_INSURE_FALSE@am__append_12 = \
 @ROSE_USE_INSURE_FALSE@      test2003_24.C \
 @ROSE_USE_INSURE_FALSE@      test2004_82.C
 
@@ -441,10 +448,9 @@ am__DEPENDENCIES_8 = $(abspath $(top_builddir)/src/librose.la) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_6) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(ROSE_ADA_LIBS_WITH_PATH) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_7)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_7)
 CFGTest_DEPENDENCIES = $(am__DEPENDENCIES_8)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -1135,10 +1141,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1246,8 +1252,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1529,9 +1536,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1566,27 +1577,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1646,7 +1646,7 @@ EXTRA_DIST = testfile1.c testfile1.c.cfg testfile1.c.du \
 SUBDIRS = testCallGraphAnalysis defUseAnalysisTests \
 	variableLivenessTests variableRenamingTests \
 	generalDataFlowAnalysisTests systemDependenceGraphTests \
-	typeTraitTests $(am__append_2)
+	typeTraitTests $(am__append_3)
 
 # ROSE Test Harness scripts
 #CHECK_ANSWER = $(top_srcdir)/scripts/test_against_answer
@@ -1657,7 +1657,7 @@ AM_CPPFLAGS = $(ROSE_INCLUDES) -I$(top_srcdir)/src/midend/programAnalysis -I$(to
 AM_LDFLAGS = $(ROSE_RPATHS)
 # DQ (2/10/2010): ROSE currently fails to generate code for this file (it does however compile for analysis only).
 # CFGTest_SOURCES = CFGTest.C
-CFGTest_SOURCES = $(am__append_3)
+CFGTest_SOURCES = $(am__append_4)
 CFGTest_LDADD = $(ROSE_LIBS)
 DataFlowTest_SOURCES = DataFlowTest.C
 DataFlowTest_LDADD = $(ROSE_LIBS)
@@ -1686,7 +1686,7 @@ VFA_SPECIMEN_DIR = $(top_srcdir)/tests/nonsmoke/functional/CompileTests/Cxx_test
 EXAMPLE_TESTCODES_REQUIRED_TO_PASS =  \
 	$(EXAMPLE_TESTCODES_REQUIRED_TO_PASS_FOLDED_CONSTANTS) \
 	$(FAILING_ORIGINAL_EXPRESSION_TREE_FIXUP_ORIGINAL_EXPRESSION_TREE_ELIMINATION) \
-	$(am__append_11)
+	$(am__append_12)
 EXAMPLE_TESTCODES_REQUIRED_TO_PASS_FOLDED_CONSTANTS =  \
 	test_CplusplusMacro_Cpp.C test2001_01.C test2001_02.C \
 	test2001_03.C test2001_04.C test2001_05.C test2001_06.C \
@@ -1878,8 +1878,8 @@ EXAMPLE_TESTCODES_REQUIRED_TO_PASS_FOLDED_CONSTANTS =  \
 	inputForLoopLocator.C X.C test2005_09.C test2005_104.C \
 	$(FAILING_ORIGINAL_EXPRESSION_TREE_FIXUP_CONSTANT_FOLDING_ELIMINATION) \
 	$(FAILING_ORIGINAL_EXPRESSION_TREE_FIXUP_CONSTANT_FOLDING_ELIMINATION_FOR_FILE_IO_TESTS) \
-	$(am__append_4) $(am__append_5) $(am__append_6) \
-	$(am__append_7)
+	$(am__append_5) $(am__append_6) $(am__append_7) \
+	$(am__append_8)
 
 # Orgainize files lists:
 EDG_49_CLANG_PROBLEM_FILES = \
@@ -1939,7 +1939,7 @@ EDG_412_GNU_6_1_PROBLEM_FILES = \
 # This is an unknown compiler.
 #	@echo "USING_INTEL_COMPILER == false"
 OLD_EXAMPLE_TESTCODES_REQUIRED_TO_PASS_FOLDED_CONSTANTS =  \
-	$(am__append_8) test2005_42.C $(am__append_9)
+	$(am__append_9) test2005_42.C $(am__append_10)
 
 # DQ (1/19/2017): This test code fails for GNU 6.1 in the unparseToString_tests directory.
 # if !ROSE_USING_GCC_VERSION_LATER_6_1
@@ -1971,7 +1971,7 @@ test2010_25.C
 
 # DQ (9/24/2011): Failing astFileIO test as a result of making replacing constant folded values with the original expression trees.
 OLD_FAILING_ORIGINAL_EXPRESSION_TREE_FIXUP_CONSTANT_FOLDING_ELIMINATION_FOR_FILE_IO_TESTS =  \
-	test2006_125.C $(am__append_10)
+	test2006_125.C $(am__append_11)
 
 # DQ (2/12/2011): This test fails for the astFileIO tests in tests/nonsmoke/functional/roseTests/astFileIOTests.
 # test2011_08.C 
@@ -2422,7 +2422,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

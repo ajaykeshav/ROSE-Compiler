@@ -113,31 +113,45 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_GNU_COMPILER_TRUE@am__append_2 = astMergeTests astPerformanceTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_GNU_COMPILER_TRUE@              astProcessingTests astQueryTests astRewriteTests astSymbolTableTests astTokenStreamTests astSnippetTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_GNU_COMPILER_TRUE@              programTransformationTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_GNU_COMPILER_TRUE@              graph_tests mergeTraversal_tests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_GNU_COMPILER_TRUE@              astLValueTests abstractMemoryObjectTests varDeclNorm
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
+
+# DQ (9/22/2020): Exclude the Intel compiler for now since it's testing is assigned 
+# to a slow machine on Jenkins and it causes the tests to take 5.75 hours. We have 
+# newer and faster machines coming soon.
+# DQ (9/18/2020): Comment out as a test so that we can use clang and Intel compilers.
+# if USING_GNU_COMPILER
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_3 = astMergeTests astPerformanceTests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@              astProcessingTests astQueryTests astRewriteTests astSymbolTableTests astTokenStreamTests astSnippetTests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@              programTransformationTests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@              graph_tests mergeTraversal_tests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@USING_INTEL_COMPILER_FALSE@              astLValueTests abstractMemoryObjectTests varDeclNorm
 
 
 # DQ (11/5/2016): Skip these tests when using the address sanitizer since they would 
 # take SO LONG (at least over an hour for initial testing, I think).
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_SANITIZER_FALSE@@USING_GNU_COMPILER_TRUE@am__append_3 = ROSETTA
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GNU_COMPILER_TRUE@am__append_4 = roseHPCToolkitTests 
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_SANITIZER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_4 = ROSETTA
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_5 = roseHPCToolkitTests 
 
 # TOO (2/16/2011): Errors with Thrifty (GCC 3.4.4) backend compiler. We can gradually
 # enable these tests at a later stage if necessary.
 # TOO (2/17/11): Errors with Tensilica's Xtensa compilers. 
 #  SUBDIRS += astInterfaceTests astInliningTests ompLoweringTests astFileIOTests programAnalysisTests astOutliningTests loopProcessingTests fileLocation_tests
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_5 = astInterfaceTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	astInliningTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	ompLoweringTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	programAnalysisTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	astOutliningTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	loopProcessingTests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	fileLocation_tests \
-@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_GNU_COMPILER_TRUE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	astFileIOTests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_6 = astInterfaceTests astInliningTests 
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_7 = ompLoweringTests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_8 = programAnalysisTests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_9 = astOutliningTests
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@am__append_10 = loopProcessingTests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	fileLocation_tests \
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@	astFileIOTests
+
+# endif # USING_GNU_COMPILER
 
 # DQ (4/23/2011): At least one of the files (process_cmdline.o) in this directory does not seem 
 # to compile with Insure++ (it hangs for Hudson, but I can't reproduce the problem locally).
@@ -146,7 +160,7 @@ host_triplet = @host@
 # DQ (8/23/2013): This is a part of SUBDIRS above and is redundant here.
 # SUBDIRS += roseHPCToolkitTests utilTests
 # SUBDIRS += roseHPCToolkitTests
-@ROSE_BUILD_PHP_LANGUAGE_SUPPORT_TRUE@am__append_6 = PHPTests
+@ROSE_BUILD_PHP_LANGUAGE_SUPPORT_TRUE@am__append_11 = PHPTests
 subdir = tests/nonsmoke/functional/roseTests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -913,10 +927,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1024,8 +1038,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1307,9 +1322,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1344,27 +1363,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1412,8 +1420,9 @@ RTH_STATS = $(top_srcdir)/scripts/rth_stats.pl
 
 # DQ (4/17/2010): These directories are now organized based on what sets of languages 
 # are enabled in ROSE (including binary analysis).
-SUBDIRS = $(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6)
+SUBDIRS = $(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9) $(am__append_10) $(am__append_11)
 all: all-recursive
 
 .SUFFIXES:
@@ -1739,7 +1748,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -1755,6 +1763,8 @@ clean-test-targets:
 clean-local: clean-test-targets
 
 .PHONY: clean-test-targets
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@ # DQ (9/19/2020): Clang does not work with most of the test codes in this directory.
+@ROSE_BUILD_CXX_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INSURE_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_GCC_3_4_4_BACKEND_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@@USING_XTENSA_BACKEND_COMPILER_FALSE@ # DQ (9/19/2020): Clang does not work with most of the test codes in this directory.
 
 check-local:
 	@echo "*******************************************"

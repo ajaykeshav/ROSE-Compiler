@@ -113,7 +113,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 
 # NOTE: test2016_40.C fails due to a problem isolated into test2019_167.C (which required a more general form of name qualification support).
 
@@ -125,86 +132,120 @@ host_triplet = @host@
 
 # NOTE: test2012_10.C works on with GNU 5.1, but not GNU 6.1 (something different in the header files, not handled by EDG 4.12).
 # Priority to fix: test2014_85.C, test2015_11.C, test2016_41.C, test2017_17.C
-@USING_INTEL_COMPILER_TRUE@am__append_2 = \
+@USING_INTEL_COMPILER_TRUE@am__append_3 = \
 @USING_INTEL_COMPILER_TRUE@    rose-2037.C
 
-@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_3 = \
+@ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_4 = \
 @ROSE_USING_GCC_VERSION_LATER_6_1_TRUE@@USING_INTEL_COMPILER_FALSE@    rose-2037.C
 
-@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_4 = \
+@ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_5 = \
 @ROSE_USING_GCC_VERSION_LATER_6_1_FALSE@@USING_INTEL_COMPILER_FALSE@    rose-2037.C
 
-@USING_INTEL_COMPILER_TRUE@am__append_5 = test2016_26.C test2016_27.C \
-@USING_INTEL_COMPILER_TRUE@	test2016_31.C test2019_162.C \
-@USING_INTEL_COMPILER_TRUE@	rose-1380.C rose-1774.C \
-@USING_INTEL_COMPILER_TRUE@	test2012_14.C test2012_26.C \
-@USING_INTEL_COMPILER_TRUE@	test2018_105.C test2018_117.C \
-@USING_INTEL_COMPILER_TRUE@	test2018_118.C test2018_127.C \
-@USING_INTEL_COMPILER_TRUE@	test2018_136.C test2018_93.C \
-@USING_INTEL_COMPILER_TRUE@	test2018_96.C test2019_04.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_110.C test2019_111.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_112.C test2019_218.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_219.C test2019_230.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_231.C test2019_344.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_355.C test2019_367.C \
-@USING_INTEL_COMPILER_TRUE@	test2019_94.C test2019_95.C \
-@USING_INTEL_COMPILER_TRUE@	test2018_100.C
-@USING_INTEL_COMPILER_FALSE@am__append_6 = test2016_26.C test2016_27.C \
-@USING_INTEL_COMPILER_FALSE@	test2016_31.C test2019_162.C \
-@USING_INTEL_COMPILER_FALSE@	rose-1380.C rose-1774.C \
-@USING_INTEL_COMPILER_FALSE@	test2012_14.C test2012_26.C \
-@USING_INTEL_COMPILER_FALSE@	test2018_105.C test2018_117.C \
-@USING_INTEL_COMPILER_FALSE@	test2018_118.C test2018_127.C \
-@USING_INTEL_COMPILER_FALSE@	test2018_136.C test2018_93.C \
-@USING_INTEL_COMPILER_FALSE@	test2018_96.C test2019_04.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_110.C test2019_111.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_112.C test2019_218.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_219.C test2019_230.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_231.C test2019_344.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_355.C test2019_367.C \
-@USING_INTEL_COMPILER_FALSE@	test2019_95.C
-#  TESTCODES_REQUIRED_TO_PASS += 
-@ROSE_USING_GCC_VERSION_LATER_4_9_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_7 = \
-@ROSE_USING_GCC_VERSION_LATER_4_9_FALSE@@USING_INTEL_COMPILER_FALSE@   test2018_100.C 
+@USING_INTEL_COMPILER_TRUE@am__append_6 = \
+@USING_INTEL_COMPILER_TRUE@     test2016_26.C \
+@USING_INTEL_COMPILER_TRUE@     test2016_27.C \
+@USING_INTEL_COMPILER_TRUE@     test2016_31.C \
+@USING_INTEL_COMPILER_TRUE@     test2019_162.C
 
-@OS_MACOSX_TRUE@am__append_8 = \
-@OS_MACOSX_TRUE@     test2016_12.C \
-@OS_MACOSX_TRUE@     test2016_20.C \
-@OS_MACOSX_TRUE@     test2016_23.C \
-@OS_MACOSX_TRUE@     test2016_24.C \
-@OS_MACOSX_TRUE@     test2016_33.C \
-@OS_MACOSX_TRUE@     test2016_34.C \
-@OS_MACOSX_TRUE@     test2016_35.C \
-@OS_MACOSX_TRUE@     test2016_36.C \
-@OS_MACOSX_TRUE@     test2016_90.C 
-
-@OS_MACOSX_FALSE@am__append_9 = \
-@OS_MACOSX_FALSE@     test2016_23.C \
-@OS_MACOSX_FALSE@     test2016_24.C \
-@OS_MACOSX_FALSE@     test2016_33.C \
-@OS_MACOSX_FALSE@     test2016_34.C \
-@OS_MACOSX_FALSE@     test2016_35.C \
-@OS_MACOSX_FALSE@     test2016_36.C 
+@USING_INTEL_COMPILER_FALSE@am__append_7 = \
+@USING_INTEL_COMPILER_FALSE@     test2016_26.C \
+@USING_INTEL_COMPILER_FALSE@     test2016_27.C \
+@USING_INTEL_COMPILER_FALSE@     test2016_31.C \
+@USING_INTEL_COMPILER_FALSE@     test2019_162.C \
+@USING_INTEL_COMPILER_FALSE@   test2019_299.C 
 
 
-# skip these codes when using GNU 10.1 (testing)
-# DQ (7/23/2020): These are failing code for EDG 6.0 and GNU 10.1 (debugging this).
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@am__append_10 = \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   rose-1973.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2012_25.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2016_16.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2016_20.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2016_90.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2018_100.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_31.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_33.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_39.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_41.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_42.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_94.C \
-@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@   test2019_463.C 
+# INTEL compiler
+#   TESTCODE_CURRENTLY_FAILING += \
+#     rose-1380.C \
+#     rose-1774.C \
+#     test2012_14.C \
+#     test2012_26.C \
+#     test2018_105.C \
+#     test2018_117.C \
+#     test2018_118.C \
+#     test2018_127.C \
+#     test2018_136.C \
+#     test2018_93.C \
+#     test2018_96.C \
+#     test2019_04.C \
+#     test2019_110.C \
+#     test2019_111.C \
+#     test2019_112.C \
+#     test2019_218.C \
+#     test2019_219.C \
+#     test2019_230.C \
+#     test2019_231.C \
+#     test2019_344.C \
+#     test2019_355.C \
+#     test2019_367.C \
+#     test2019_94.C \
+#     test2019_95.C
+@USING_INTEL_COMPILER_TRUE@am__append_8 = \
+@USING_INTEL_COMPILER_TRUE@        test2012_07.C \
+@USING_INTEL_COMPILER_TRUE@   test2014_88.C 
 
-@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_11 = --edg:no_warnings --edg:restrict
+# CLANG compiler
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_9 = \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@        rose-1380.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@        test2012_07.C 
+
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@am__append_10 = \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_247.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_248.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_272.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_273.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_274.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_291.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2019_292.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2020_54.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2020_55.C \
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@   test2020_56.C 
+
+
+#      TESTCODES_REQUIRED_TO_PASS += 
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_11 = \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@     test2016_23.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@     test2016_35.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@     test2016_36.C 
+
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_TRUE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_12 = \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_TRUE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2020_69.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_TRUE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2020_70.C 
+
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_13 = \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         rose-1973.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2012_07.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2012_25.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2016_16.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2016_20.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2019_39.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2019_41.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2019_42.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@         test2019_463.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_69.C \
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_70.C 
+
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@am__append_14 = \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        rose-1380.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2014_88.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2018_54.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_93.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_96.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_105.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_117.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_118.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_127.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2018_136.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@        test2019_344.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2019_474.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2019_488.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_14.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_19.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_20.C \
+@OS_MACOSX_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@   test2020_21.C 
+
+@ROSE_USE_CLANG_FRONTEND_FALSE@am__append_15 = --edg:no_warnings --edg:restrict
 subdir = tests/nonsmoke/functional/CompileTests/Cxx11_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -904,10 +945,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1015,8 +1056,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1298,9 +1340,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1335,27 +1381,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1409,9 +1444,11 @@ AM_LDFLAGS = $(ROSE_RPATHS)
 LDADD = $(ROSE_LIBS)
 
 # globalVariablesInLambdas_TESTS = test_1.C
+
+# DQ (9/18/2020): After retesting these older files, they now pass (at least with Clang 10.0).
 TESTCODES_REQUIRED_TO_PASS = test2012_01.C test2012_02.C test2012_03.C \
-	test2012_04.C test2012_05.C test2012_06.C test2012_07.C \
-	test2012_09.C test2012_11.C test2012_12.C test2012_13.C \
+	test2012_04.C test2012_05.C test2012_06.C test2012_09.C \
+	test2012_10.C test2012_11.C test2012_12.C test2012_13.C \
 	test2012_15.C test2012_16.C test2012_17.C test2012_18.C \
 	test2012_19.C test2012_20.C test2012_21.C test2012_22.C \
 	test2012_27.C test2012_28.C test2012_29.C test2012_30.C \
@@ -1434,89 +1471,88 @@ TESTCODES_REQUIRED_TO_PASS = test2012_01.C test2012_02.C test2012_03.C \
 	test2014_74.C test2014_75.C test2014_76.C test2014_77.C \
 	test2014_78.C test2014_79.C test2014_80.C test2014_81.C \
 	test2014_82.C test2014_83.C test2014_84.C test2014_85.C \
-	test2014_86.C test2014_87.C test2014_88.C test2014_89.C \
-	test2014_90.C test2015_01.C test2015_02.C test2015_03.C \
-	test2015_04.C test2015_05.C test2015_06.C test2015_07.C \
-	test2015_08.C test2015_09.C test2015_10.C test2015_12.C \
-	test2015_13.C test2015_14.C test2015_15.C test2015_16.C \
-	test2016_01.C test2016_03.C test2016_04.C test2016_06.C \
-	test2016_07.C test2016_10.C test2016_11.C test2016_12.C \
-	test2016_13.C test2016_14.C test2016_15.C test2016_17.C \
-	test2016_18.C test2016_19.C test2016_21.C test2016_22.C \
-	test2016_25.C test2016_28.C test2016_29.C test2016_30.C \
-	test2016_37.C test2016_39.C test2016_42.C test2016_91.C \
-	test2016_92.C test2016_93.C test2017_03.C test2017_04.C \
-	test2017_07.C test2017_08.C test2017_09.C test2017_11.C \
-	test2017_12.C test2017_13.C test2017_14.C test2017_15.C \
-	test2017_16.C test2017_18.C test2017_19.C test2017_20.C \
-	test2017_21.C test2017_22.C test2017_23.C test2018_04.C \
-	test2018_05.C test2018_06.C test2018_07.C test2018_08.C \
-	test2018_09.C test2018_10.C test2018_11.C test2018_12.C \
-	test2018_13.C test2018_14.C test2018_15.C test2018_16.C \
-	test2018_17.C test2018_18.C test2018_19.C test2018_20.C \
-	test2018_21.C test2018_23.C test2018_24.C test2018_26.C \
-	test2018_27.C test2018_28.C test2018_29.C test2018_30.C \
-	test2018_31.C test2018_34.C test2018_35.C test2018_36.C \
-	test2018_37.C test2018_38.C test2018_39.C test2018_40.C \
-	test2018_41.C test2018_42.C test2018_43.C test2018_44.C \
-	test2018_45.C test2018_46.C test2018_47.C test2018_48.C \
-	test2018_51.C test2018_52.C test2018_53.C test2018_54.C \
-	test2018_55.C test2018_56.C test2018_57.C test2018_58.C \
-	test2018_59.C test2018_61.C test2018_62.C test2018_66.C \
-	test2018_67.C test2018_68.C test2018_69.C test2018_70.C \
-	test2018_72.C test2018_73.C test2018_74.C test2018_75.C \
-	test2018_76.C test2018_77.C test2018_78.C test2018_79.C \
-	test2018_80.C test2018_81.C test2018_82.C test2018_83.C \
-	test2018_84.C test2018_85.C test2018_86.C test2018_88.C \
-	test2018_89.C test2018_90.C test2018_91.C test2018_92.C \
-	test2018_94.C test2018_95.C test2018_97.C test2018_98.C \
-	test2018_99.C test2018_107.C test2018_108.C test2018_109.C \
-	test2018_110.C test2018_111.C test2018_112.C test2018_113.C \
-	test2018_114.C test2018_115.C test2018_116.C test2018_119.C \
-	test2018_120.C test2018_121.C test2018_124.C test2018_130.C \
-	test2018_131.C test2018_132.C test2018_133.C test2018_134.C \
-	test2018_135.C test2018_137.C ctor-list-init.C rose-1379-a.C \
-	rose-1379-b.C rose-1437-0.C test2017_10.C rose-1522-0.C \
-	rose-1763.C rose-1863.C test2019_01.C test2019_02.C \
-	test2019_03.C test2019_05.C test2019_06.C test2019_07.C \
-	test2019_08.C test2019_10.C test2019_11.C test2019_12.C \
-	test2019_13.C test2019_14.C test2019_17.C test2019_18.C \
-	test2019_19.C test2019_20.C test2019_21.C test2019_22.C \
-	test2019_23.C test2019_24.C test2019_25.C test2019_26.C \
-	test2019_27.C test2019_28.C test2019_29.C test2019_30.C \
-	test2019_32.C test2019_35.C test2019_36.C test2019_40.C \
-	test2019_45.C test2019_46.C test2019_47.C test2019_48.C \
-	test2019_49.C test2019_50.C test2019_51.C test2019_52.C \
-	test2019_53.C test2019_54.C test2019_55.C test2019_56.C \
-	test2019_59.C test2019_60.C test2019_61.C test2019_62.C \
-	test2019_63.C test2019_64.C test2019_65.C test2019_66.C \
-	test2019_67.C test2019_68.C test2019_69.C test2019_70.C \
-	test2019_71.C test2019_72.C test2019_73.C test2019_74.C \
-	test2019_75.C test2019_76.C test2019_77.C test2019_78.C \
-	test2019_79.C test2019_80.C test2019_81.C test2019_82.C \
-	test2019_83.C test2019_86.C test2019_87.C test2019_88.C \
-	test2019_89.C test2019_90.C test2019_91.C test2019_92.C \
-	test2019_93.C test2019_96.C test2019_97.C test2019_98.C \
-	test2019_99.C test2019_100.C test2019_101.C test2019_102.C \
-	test2019_105.C test2019_106.C test2019_107.C test2019_108.C \
-	test2019_113.C test2019_114.C test2019_115.C test2019_116.C \
-	test2019_117.C test2019_118.C test2019_119.C test2019_120.C \
-	test2019_121.C test2019_123.C test2019_124.C test2019_125.C \
-	test2019_129.C test2019_130.C test2019_131.C test2019_133.C \
-	test2019_134.C test2019_135.C test2019_136.C test2019_137.C \
-	test2019_138.C test2019_139.C test2019_140.C test2019_141.C \
-	test2019_142.C test2019_143.C test2019_144.C test2019_145.C \
-	test2019_146.C test2019_147.C test2019_150.C test2019_151.C \
-	test2019_152.C test2019_153.C test2019_154.C test2019_155.C \
-	test2019_156.C test2019_157.C test2019_160.C test2019_163.C \
-	test2019_164.C test2019_165.C test2019_166.C test2019_167.C \
-	test2019_168.C test2019_169.C test2019_170.C test2019_171.C \
-	test2019_172.C test2019_173.C test2019_174.C test2019_175.C \
-	test2019_176.C test2019_177.C test2019_178.C test2019_179.C \
-	test2019_180.C test2019_181.C test2019_184.C test2019_185.C \
-	test2019_186.C test2019_187.C test2019_188.C test2019_189.C \
-	test2019_190.C test2019_191.C test2019_192.C test2019_193.C \
-	test2019_194.C test2019_195.C test2019_196_a.C \
+	test2014_86.C test2014_87.C test2014_89.C test2014_90.C \
+	test2015_01.C test2015_02.C test2015_03.C test2015_04.C \
+	test2015_05.C test2015_06.C test2015_07.C test2015_08.C \
+	test2015_09.C test2015_10.C test2015_12.C test2015_13.C \
+	test2015_14.C test2015_15.C test2015_16.C test2016_01.C \
+	test2016_03.C test2016_04.C test2016_06.C test2016_07.C \
+	test2016_10.C test2016_11.C test2016_12.C test2016_13.C \
+	test2016_14.C test2016_15.C test2016_17.C test2016_18.C \
+	test2016_19.C test2016_21.C test2016_22.C test2016_25.C \
+	test2016_28.C test2016_29.C test2016_30.C test2016_37.C \
+	test2016_39.C test2016_42.C test2016_91.C test2016_92.C \
+	test2016_93.C test2017_03.C test2017_04.C test2017_07.C \
+	test2017_08.C test2017_09.C test2017_11.C test2017_12.C \
+	test2017_13.C test2017_14.C test2017_15.C test2017_16.C \
+	test2017_18.C test2017_19.C test2017_20.C test2017_21.C \
+	test2017_22.C test2017_23.C test2018_04.C test2018_05.C \
+	test2018_06.C test2018_07.C test2018_08.C test2018_09.C \
+	test2018_10.C test2018_11.C test2018_12.C test2018_13.C \
+	test2018_14.C test2018_15.C test2018_16.C test2018_17.C \
+	test2018_18.C test2018_19.C test2018_20.C test2018_21.C \
+	test2018_23.C test2018_24.C test2018_26.C test2018_27.C \
+	test2018_28.C test2018_29.C test2018_30.C test2018_31.C \
+	test2018_34.C test2018_35.C test2018_36.C test2018_37.C \
+	test2018_38.C test2018_39.C test2018_40.C test2018_41.C \
+	test2018_42.C test2018_43.C test2018_44.C test2018_45.C \
+	test2018_46.C test2018_47.C test2018_48.C test2018_51.C \
+	test2018_52.C test2018_53.C test2018_55.C test2018_56.C \
+	test2018_57.C test2018_58.C test2018_59.C test2018_61.C \
+	test2018_62.C test2018_66.C test2018_67.C test2018_68.C \
+	test2018_69.C test2018_70.C test2018_72.C test2018_73.C \
+	test2018_74.C test2018_75.C test2018_76.C test2018_77.C \
+	test2018_78.C test2018_79.C test2018_80.C test2018_81.C \
+	test2018_82.C test2018_83.C test2018_84.C test2018_85.C \
+	test2018_86.C test2018_88.C test2018_89.C test2018_90.C \
+	test2018_91.C test2018_92.C test2018_94.C test2018_95.C \
+	test2018_97.C test2018_98.C test2018_99.C test2018_107.C \
+	test2018_108.C test2018_109.C test2018_110.C test2018_111.C \
+	test2018_112.C test2018_113.C test2018_114.C test2018_115.C \
+	test2018_116.C test2018_119.C test2018_120.C test2018_121.C \
+	test2018_124.C test2018_130.C test2018_131.C test2018_132.C \
+	test2018_133.C test2018_134.C test2018_135.C test2018_137.C \
+	ctor-list-init.C rose-1379-a.C rose-1379-b.C rose-1437-0.C \
+	test2017_10.C rose-1522-0.C rose-1763.C rose-1863.C \
+	test2019_01.C test2019_02.C test2019_03.C test2019_05.C \
+	test2019_06.C test2019_07.C test2019_08.C test2019_10.C \
+	test2019_11.C test2019_12.C test2019_13.C test2019_14.C \
+	test2019_17.C test2019_18.C test2019_19.C test2019_20.C \
+	test2019_21.C test2019_22.C test2019_23.C test2019_24.C \
+	test2019_25.C test2019_26.C test2019_27.C test2019_28.C \
+	test2019_29.C test2019_30.C test2019_32.C test2019_35.C \
+	test2019_36.C test2019_40.C test2019_45.C test2019_46.C \
+	test2019_47.C test2019_48.C test2019_49.C test2019_50.C \
+	test2019_51.C test2019_52.C test2019_53.C test2019_54.C \
+	test2019_55.C test2019_56.C test2019_59.C test2019_60.C \
+	test2019_61.C test2019_62.C test2019_63.C test2019_64.C \
+	test2019_65.C test2019_66.C test2019_67.C test2019_68.C \
+	test2019_69.C test2019_70.C test2019_71.C test2019_72.C \
+	test2019_73.C test2019_74.C test2019_75.C test2019_76.C \
+	test2019_77.C test2019_78.C test2019_79.C test2019_80.C \
+	test2019_81.C test2019_82.C test2019_83.C test2019_86.C \
+	test2019_87.C test2019_88.C test2019_89.C test2019_90.C \
+	test2019_91.C test2019_92.C test2019_93.C test2019_96.C \
+	test2019_97.C test2019_98.C test2019_99.C test2019_100.C \
+	test2019_101.C test2019_102.C test2019_105.C test2019_106.C \
+	test2019_107.C test2019_108.C test2019_113.C test2019_114.C \
+	test2019_115.C test2019_116.C test2019_117.C test2019_118.C \
+	test2019_119.C test2019_120.C test2019_123.C test2019_124.C \
+	test2019_125.C test2019_129.C test2019_130.C test2019_131.C \
+	test2019_133.C test2019_134.C test2019_135.C test2019_136.C \
+	test2019_137.C test2019_138.C test2019_139.C test2019_140.C \
+	test2019_141.C test2019_142.C test2019_143.C test2019_144.C \
+	test2019_145.C test2019_146.C test2019_147.C test2019_150.C \
+	test2019_151.C test2019_152.C test2019_153.C test2019_154.C \
+	test2019_155.C test2019_156.C test2019_157.C test2019_160.C \
+	test2019_163.C test2019_164.C test2019_165.C test2019_166.C \
+	test2019_167.C test2019_168.C test2019_169.C test2019_170.C \
+	test2019_171.C test2019_172.C test2019_173.C test2019_174.C \
+	test2019_175.C test2019_176.C test2019_177.C test2019_178.C \
+	test2019_179.C test2019_180.C test2019_181.C test2019_184.C \
+	test2019_185.C test2019_186.C test2019_187.C test2019_188.C \
+	test2019_189.C test2019_190.C test2019_191.C test2019_192.C \
+	test2019_193.C test2019_194.C test2019_195.C test2019_196_a.C \
 	test2019_196_b.C test2019_197.C test2019_198_a.C \
 	test2019_198_b.C test2019_200_a.C test2019_200_b.C \
 	test2019_202.C test2019_205.C test2019_206.C test2019_207.C \
@@ -1541,36 +1577,35 @@ TESTCODES_REQUIRED_TO_PASS = test2012_01.C test2012_02.C test2012_03.C \
 	test2019_352.C test2019_353.C test2019_354.C test2019_356.C \
 	test2019_357.C test2019_358.C test2019_359.C test2019_360.C \
 	test2019_360.C test2019_361.C test2019_362.C test2019_363.C \
-	test2019_364.C test2019_365.C test2019_368.C test2019_369.C \
-	test2019_370.C test2019_371.C test2019_372.C test2019_373.C \
-	test2019_374.C test2019_375.C test2019_376.C test2019_377.C \
-	test2019_378.C test2019_379.C test2019_380.C test2019_381.C \
-	test2019_383.C test2019_384.C test2019_385.C test2019_386.C \
-	test2019_387.C test2019_389.C test2019_390.C test2019_391.C \
-	test2019_392.C test2019_393.C test2019_394.C test2019_395.C \
-	test2019_396.C test2019_397.C test2019_398.C test2019_399.C \
-	test2019_400.C test2019_401.C test2019_402.C test2019_403.C \
-	test2019_404.C test2019_405.C test2019_406.C test2019_407.C \
-	test2019_408.C test2019_409.C test2019_410.C test2019_412.C \
-	test2019_413.C test2019_414.C test2019_415.C test2019_416.C \
-	test2019_417.C test2019_418.C test2019_419.C test2019_420.C \
-	test2019_421.C test2019_422.C test2019_423.C test2019_424.C \
-	test2019_425.C test2019_426.C test2019_427.C test2019_428.C \
-	test2019_429.C test2019_430.C test2019_431.C test2019_432.C \
-	test2019_433.C test2019_434.C test2019_435.C test2019_436.C \
-	test2019_437.C test2019_439.C test2019_440.C test2019_441.C \
-	test2019_442.C test2019_443.C test2019_444.C test2019_445.C \
-	test2019_446.C test2019_447.C test2019_448.C test2019_449.C \
-	test2019_450.C test2019_451.C test2019_452.C test2019_454.C \
-	test2019_455.C test2019_456.C test2019_457.C test2019_458.C \
-	test2019_459.C test2019_460.C test2019_461.C test2019_462.C \
-	test2019_464.C test2019_465.C test2019_466.C test2019_467.C \
-	test2019_468.C test2019_469.C test2019_470.C test2019_471.C \
-	test2019_472.C test2019_473.C test2019_474.C test2019_475.C \
-	test2019_476.C test2019_477.C test2019_478.C test2019_479.C \
-	test2019_480.C test2019_481.C test2019_482.C test2019_483.C \
-	test2019_484.C test2019_485.C test2019_486.C test2019_487.C \
-	test2019_488.C test2019_489.C test2019_490.C test2019_491.C \
+	test2019_364.C test2019_368.C test2019_369.C test2019_370.C \
+	test2019_371.C test2019_372.C test2019_373.C test2019_374.C \
+	test2019_375.C test2019_376.C test2019_377.C test2019_378.C \
+	test2019_379.C test2019_380.C test2019_381.C test2019_383.C \
+	test2019_384.C test2019_385.C test2019_386.C test2019_387.C \
+	test2019_389.C test2019_390.C test2019_391.C test2019_392.C \
+	test2019_393.C test2019_394.C test2019_395.C test2019_396.C \
+	test2019_397.C test2019_398.C test2019_399.C test2019_400.C \
+	test2019_401.C test2019_402.C test2019_403.C test2019_404.C \
+	test2019_405.C test2019_406.C test2019_407.C test2019_408.C \
+	test2019_409.C test2019_410.C test2019_412.C test2019_413.C \
+	test2019_414.C test2019_415.C test2019_416.C test2019_417.C \
+	test2019_418.C test2019_419.C test2019_420.C test2019_421.C \
+	test2019_422.C test2019_423.C test2019_424.C test2019_425.C \
+	test2019_426.C test2019_427.C test2019_428.C test2019_429.C \
+	test2019_430.C test2019_431.C test2019_432.C test2019_433.C \
+	test2019_434.C test2019_435.C test2019_436.C test2019_437.C \
+	test2019_439.C test2019_440.C test2019_441.C test2019_442.C \
+	test2019_443.C test2019_444.C test2019_445.C test2019_446.C \
+	test2019_447.C test2019_448.C test2019_449.C test2019_450.C \
+	test2019_451.C test2019_452.C test2019_454.C test2019_455.C \
+	test2019_456.C test2019_457.C test2019_458.C test2019_459.C \
+	test2019_460.C test2019_461.C test2019_462.C test2019_464.C \
+	test2019_465.C test2019_466.C test2019_467.C test2019_468.C \
+	test2019_469.C test2019_470.C test2019_471.C test2019_472.C \
+	test2019_473.C test2019_475.C test2019_476.C test2019_477.C \
+	test2019_478.C test2019_479.C test2019_480.C test2019_481.C \
+	test2019_483.C test2019_484.C test2019_485.C test2019_486.C \
+	test2019_487.C test2019_489.C test2019_490.C test2019_491.C \
 	test2019_493.C test2019_494.C test2019_495.C test2019_496.C \
 	test2019_497.C test2019_498.C test2019_499.C test2019_500.C \
 	test2019_501.C test2019_502.C test2019_503.C test2019_512.C \
@@ -1578,9 +1613,8 @@ TESTCODES_REQUIRED_TO_PASS = test2012_01.C test2012_02.C test2012_03.C \
 	test2020_01.C test2020_02.C test2020_03.C test2020_04.C \
 	test2020_05.C test2020_06.C test2020_07.C test2020_08.C \
 	test2020_09.C test2020_10.C test2020_11.C test2020_12.C \
-	test2020_13.C test2020_14.C test2020_15.C test2020_16.C \
-	test2020_17.C test2020_18.C test2020_19.C test2020_20.C \
-	test2020_21.C test2020_22.C test2020_23.C test2020_24.C \
+	test2020_13.C test2020_15.C test2020_16.C test2020_17.C \
+	test2020_18.C test2020_22.C test2020_23.C test2020_24.C \
 	test2020_25.C test2020_26.C test2020_27.C test2020_28.C \
 	test2020_29.C test2020_30.C test2020_31.C test2020_32.C \
 	test2020_33.C test2020_34.C test2020_35.C test2020_36.C \
@@ -1589,44 +1623,114 @@ TESTCODES_REQUIRED_TO_PASS = test2012_01.C test2012_02.C test2012_03.C \
 	test2020_46.C test2020_47.C test2020_48.C test2020_49.C \
 	test2020_50.C test2020_52.C test2020_53.C test2020_57.C \
 	test2020_58.C test2020_59.C test2020_66.C test2020_67.C \
-	test2020_68.C test2020_69.C test2020_70.C test2020_74.C \
-	test2020_75.C test2020_76.C $(am__append_3) test2012_08.C \
+	test2020_68.C test2020_74.C test2020_75.C test2020_76.C \
+	test2020_77.C test2020_78.C test2020_79.C test2020_81.C \
+	test2020_83.C test2020_84.C test2020_85.C test2020_86.C \
+	test2020_88.C test2020_89.C test2020_90.C test2020_92.C \
+	test2020_93.C test2020_94.C test2020_96.C test2020_97.C \
+	test2020_98.C test2020_99.C test2020_100.C test2020_101.C \
+	test2020_102.C test2020_103.C test2020_104.C test2020_105.C \
+	test2020_106.C test2020_107.C test2020_108.C test2020_109.C \
+	test2020_110.C test2020_116.C test2019_122.C test2019_199.C \
+	test2019_201.C test2019_204.C test2019_236.C test2019_237.C \
+	test2019_238.C test2019_239.C test2019_240.C test2019_241.C \
+	test2019_242.C test2019_246.C test2019_249.C test2019_250.C \
+	test2019_251.C test2019_252.C test2019_253.C test2019_254.C \
+	test2019_255.C test2019_256.C test2019_258.C test2019_267.C \
+	test2019_268.C test2019_269.C test2019_270.C test2019_271.C \
+	test2019_275.C test2019_281.C test2019_282.C test2019_283.C \
+	test2019_284.C test2019_289.C test2019_290.C test2019_293.C \
+	test2019_294.C test2019_295.C test2019_298.C test2019_300.C \
+	test2019_302.C test2019_303.C test2019_304.C test2019_305.C \
+	test2019_307.C test2019_308.C test2019_309.C test2019_310.C \
+	test2019_312.C test2019_348.C test2019_411.C test2019_438.C \
+	test2019_505.C test2019_516.C test2019_523.C test2020_51a.C \
+	test2020_51b.C test2020_72.C test2016_24.C test2016_33.C \
+	test2016_34.C test2016_90.C test2019_31.C test2019_33.C \
+	test2019_94.C test2012_14.C test2012_26.C test2019_04.C \
+	test2019_95.C test2019_121.C test2019_110.C test2019_111.C \
+	test2019_112.C test2019_218.C test2019_219.C test2019_230.C \
+	test2019_231.C test2019_355.C test2019_365.C test2019_367.C \
+	test2019_482.C rose-1774.C $(am__append_4) test2012_08.C \
 	test2018_60.C test2018_63.C test2018_64.C test2018_65.C \
 	test2018_71.C test2019_57.C test2019_58.C test2019_158.C \
-	test2019_159.C test2019_161.C $(am__append_6) $(am__append_9) \
-	$(am__append_10)
-TESTCODE_CURRENTLY_FAILING = test2012_10.C test2012_24.C test2016_41.C \
-	test2017_17.C test2019_16.C test2019_34.C test2019_37.C \
-	test2019_38.C test2019_103.C test2019_104.C test2019_122.C \
-	test2019_132.C test2019_148.C test2019_149.C test2019_199.C \
-	test2019_201.C test2019_203.C test2019_204.C test2019_236.C \
-	test2019_237.C test2019_238.C test2019_239.C test2019_240.C \
-	test2019_241.C test2019_242.C test2019_243.C test2019_244.C \
-	test2019_245.C test2019_246.C test2019_247.C test2019_248.C \
-	test2019_249.C test2019_250.C test2019_251.C test2019_252.C \
-	test2019_253.C test2019_254.C test2019_255.C test2019_256.C \
-	test2019_257.C test2019_258.C test2019_259.C test2019_260.C \
+	test2019_159.C test2019_161.C $(am__append_7) $(am__append_8) \
+	$(am__append_10) $(am__append_11) $(am__append_13) \
+	$(am__append_14)
+
+# DQ (9/22/2020): This file fails because the #include <ext/aligned_buffer.h> can not be 
+# resolved by the Intel v17.0.4 compiler as it is installed on Jenkins. The issues seem 
+# to be that the Jenkins installation of Intel v17 is using the GNU headers and the version
+# of GNU headers is 4.8.5 (which is too old).  Installing GNU 6.1 and maybe a later version 
+# of boost than 1.57 (I'm using Boost 1.60) should fix the problem.  Nathan is fixing this
+# issue and so this file can be added back in later after Jenkins's use of GNU by Intel v17 
+# is updated.
+# test2018_100.C
+TESTCODE_CURRENTLY_FAILING = test2012_24.C test2016_41.C test2017_17.C \
+	test2019_16.C test2019_34.C test2019_37.C test2019_38.C \
+	test2019_103.C test2019_104.C test2019_132.C test2019_148.C \
+	test2019_149.C test2019_203.C test2019_243.C test2019_244.C \
+	test2019_245.C test2019_257.C test2019_259.C test2019_260.C \
 	test2019_261.C test2019_262.C test2019_263.C test2019_264.C \
-	test2019_265.C test2019_266.C test2019_267.C test2019_268.C \
-	test2019_269.C test2019_270.C test2019_271.C test2019_272.C \
-	test2019_273.C test2019_274.C test2019_275.C test2019_276.C \
-	test2019_277.C test2019_278.C test2019_279.C test2019_280.C \
-	test2019_281.C test2019_282.C test2019_283.C test2019_284.C \
-	test2019_285.C test2019_286.C test2019_287.C test2019_288.C \
-	test2019_289.C test2019_290.C test2019_291.C test2019_292.C \
-	test2019_293.C test2019_294.C test2019_295.C test2019_296.C \
-	test2019_297.C test2019_298.C test2019_299.C test2019_300.C \
-	test2019_301.C test2019_302.C test2019_303.C test2019_304.C \
-	test2019_305.C test2019_306.C test2019_307.C test2019_308.C \
-	test2019_309.C test2019_310.C test2019_311.C test2019_312.C \
-	test2019_313.C test2019_345.C test2019_346.C test2019_348.C \
-	test2019_366.C test2019_382.C test2019_388.C test2019_411.C \
-	test2019_438.C test2019_453.C test2019_492.C test2019_504.C \
-	test2019_505.C test2019_506.C test2019_511.C test2019_516.C \
-	test2019_523.C test2020_40.C test2020_51a.C test2020_51b.C \
-	test2020_54.C test2020_55.C test2020_56.C test2020_71.C \
-	test2020_72.C test2020_73.C $(am__append_2) $(am__append_4) \
-	$(am__append_5) $(am__append_7) $(am__append_8)
+	test2019_265.C test2019_266.C test2019_276.C test2019_277.C \
+	test2019_278.C test2019_279.C test2019_280.C test2019_285.C \
+	test2019_286.C test2019_287.C test2019_288.C test2019_296.C \
+	test2019_297.C test2019_301.C test2019_306.C test2019_311.C \
+	test2019_313.C test2019_345.C test2019_346.C test2019_366.C \
+	test2019_382.C test2019_388.C test2019_453.C test2019_492.C \
+	test2019_504.C test2019_506.C test2019_511.C test2020_40.C \
+	test2020_71.C test2020_73.C test2020_80.C test2020_82.C \
+	test2020_91.C test2020_95.C $(am__append_3) $(am__append_5) \
+	$(am__append_6) $(am__append_9) $(am__append_12)
+
+# DQ (9/21/2020) Notes:
+# test2014_88.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10) and appears to be missing a builtin function or the builtin function is not correctly declared.
+# test2018_54.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10)
+# test2018_105.C Passing for GNU 6.1 and Clang 10, but fails only in Intel v17
+# test2018_117.C Passing for GNU 6.1 and Clang 10, but fails only in Intel v17
+# test2018_118.C Passing for GNU 6.1 and Clang 10, but fails only in Intel v17
+# test2018_127.C Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2018_136.C Passing for GNU 6.1, but fails for Clang 10 and Intel v17: missing builtin functions.
+# test2018_93.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2018_96.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2019_344.C Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2019_474.C Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2019_488.C Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: expected class name
+# test2020_14.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2020_19.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2020_20.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+# test2020_21.C  Passing for GNU 6.1 and Intel v17, but fails only in CLANG (v10): error: reference to scoped enumeration must use 'enum' not 'enum class'
+
+# DQ (9/21/2020): This code passes for GNU v6.1, Intel v17, and Clang v10.0 (so we can eliminate this compexity).
+# if USING_INTEL_COMPILER
+#  TESTCODE_CURRENTLY_FAILING += \
+#   test2018_100.C 
+# else
+# if ROSE_USING_GCC_VERSION_LATER_4_9
+#  TESTCODES_REQUIRED_TO_PASS += 
+# else
+#   TESTCODE_CURRENTLY_FAILING += \
+#   test2018_100.C 
+# endif
+# endif
+
+#  TESTCODE_CURRENTLY_FAILING += \
+#     test2016_12.C \
+#     test2016_20.C \
+#     test2016_23.C \
+#     test2016_24.C \
+#     test2016_33.C \
+#     test2016_34.C \
+#     test2016_35.C \
+#     test2016_36.C \
+#     test2016_90.C 
+#  TESTCODES_REQUIRED_TO_PASS += \
+#     test2016_23.C \
+#     test2016_24.C \
+#     test2016_33.C \
+#     test2016_34.C \
+#     test2016_35.C \
+#     test2016_36.C 
 
 # Automake's testing mechanism (which defines the "make check" rule) requires passing tests.
 TESTCODES = \
@@ -1671,7 +1775,7 @@ TEST_TRANSLATOR = ../../testTranslator
 #########
 # ROSE_FLAGS
 LANG_FLAGS = -std=c++11
-ROSE_FLAGS = $(am__append_11) -w -rose:verbose 0 \
+ROSE_FLAGS = $(am__append_15) -w -rose:verbose 0 \
 	-rose:skip_unparse_asm_commands
 
 #
@@ -1884,7 +1988,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
@@ -1900,6 +2003,15 @@ clean-test-targets:
 clean-local: clean-test-targets
 
 .PHONY: clean-test-targets
+@USING_INTEL_COMPILER_FALSE@ # DQ (9/19/2020): Added test2019_299.C since it fails with the Intel compiler used within Jenkins (but passes Intel v17 on my REL7 machine).
+
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@    # DQ (9/19/2020) These are not handled by GNU (using both EDG 5.0 or EDG 6.0), but work with Clang.
+@USING_CLANG_COMPILER_TRUE@@USING_INTEL_COMPILER_FALSE@    # Basically, EDG handles the code, but the generated code is only handled by Clang and not GNU.
+
+# GNU compiler
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_TRUE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@      # skip these codes when using GNU 10.1 (testing)
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@      # DQ (7/23/2020): These are failing code for EDG 6.0 and GNU 10.1 (debugging this).
+@OS_MACOSX_FALSE@@ROSE_USING_GCC_VERSION_LATER_10_1_FALSE@@USING_CLANG_COMPILER_FALSE@@USING_INTEL_COMPILER_FALSE@      # DQ (9/19/2020): test2020_69.C and test2020_70.C fail for GNU 10 only (pass for EDG 6 using GNU 6.1)
 
 globalVariablesInLambdas_test: globalVariablesInLambdas
 	./globalVariablesInLambdas -std=c++11 --edg:no_warnings -c $(srcdir)/globalVariablesInLambdas_test_01.C
@@ -1951,6 +2063,9 @@ test2019_522_ab: ../../testTranslator
 
 test2020_51ab: ../../testTranslator
 	$(VALGRIND) $(TEST_TRANSLATOR) $(ROSE_FLAGS)  $(TESTCODE_INCLUDES) -c $(srcdir)/test2020_51a.C $(srcdir)/test2020_51b.C
+
+test2020_113: ../../testTranslator
+	$(VALGRIND) $(TEST_TRANSLATOR) $(ROSE_FLAGS)  $(TESTCODE_INCLUDES) -DHEADER_FILE=\"test2020_113.h\" -c $(srcdir)/test2020_113.C 
 
 #########
 # Translator to be used: calling "make TEST_TRANSLATOR=../../testBackend" uses the backend compiler only

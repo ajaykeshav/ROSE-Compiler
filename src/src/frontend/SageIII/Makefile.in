@@ -117,26 +117,33 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 
 # DQ (3/13/2010): sage_support.cpp requires the OFP fortran source files to be made available.
 # if ROSE_USE_OPEN_FORTRAN_PARSER
-@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_2 = -I${top_builddir}/src/3rdPartyLibraries/fortran-parser
-@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@am__append_3 = preproc-c.ll omplexer.cc ompparser.cc ompparser.h ompAstConstruction.h
-@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_4 = \
+@ROSE_BUILD_FORTRAN_LANGUAGE_SUPPORT_TRUE@am__append_3 = -I${top_builddir}/src/3rdPartyLibraries/fortran-parser
+@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@am__append_4 = preproc-c.ll omplexer.cc ompparser.cc ompparser.h ompAstConstruction.h
+@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_5 = \
 @ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@   OmpAttribute.C \
 @ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@   ompFortranParser.C \
 @ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@   ompAstConstruction.cpp
 
-@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@am__append_5 = preproc-c.ll
-@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_6 = omplexer.ll ompparser.yy
+@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@am__append_6 = preproc-c.ll
+@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_7 = omplexer.ll ompparser.yy
 
 # DQ (6/25/2011): Readded this directory so that we can support the older behavior as a default
 # although this will likely fail at least some of the nearly one hundred new name qualification tests.
 # DQ (6/24/2011): Removed now the the name qualification support in a part of src/backend/unparser.
 # astHiddenTypeAndDeclarationLists/libastHiddenTypeAndDeclarationLists.la 
-@ROSE_USE_SMALLER_GENERATED_FILES_TRUE@am__append_7 = GENERATED_CODE_DIRECTORY_Cxx_Grammar/libgeneratedIR.la
-@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_8 = ompparser.cc ompparser.h omplexer.cc
+@ROSE_USE_SMALLER_GENERATED_FILES_TRUE@am__append_8 = GENERATED_CODE_DIRECTORY_Cxx_Grammar/libgeneratedIR.la
+@ROSE_BUILD_CPP_LANGUAGE_SUPPORT_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@am__append_9 = ompparser.cc ompparser.h omplexer.cc
 subdir = src/frontend/SageIII
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -278,7 +285,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ROSE_USE_BOOST_WAVE_FALSE@	astFromString/libAstFromString.la \
 @ROSE_USE_BOOST_WAVE_FALSE@	astHiddenTypeAndDeclarationLists/libastHiddenTypeAndDeclarationLists.la \
 @ROSE_USE_BOOST_WAVE_FALSE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_FALSE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_FALSE@	$(am__append_8)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@libsage3_la_DEPENDENCIES = astFixup/libastFixup.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astPostProcessing/libastPostProcessing.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astMerge/libastMerge.la \
@@ -289,14 +296,14 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astFromString/libAstFromString.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astHiddenTypeAndDeclarationLists/libastHiddenTypeAndDeclarationLists.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_8)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@libsage3_la_DEPENDENCIES = astFixup/libastFixup.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	astPostProcessing/libastPostProcessing.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	sageInterface/libsageInterface.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	astVisualization/libastVisualization.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	virtualCFG/libvirtualCFG.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_8)
 am__libsage3_la_SOURCES_DIST = Utf8.C rose_attributes_list.C \
 	attachPreprocessingInfo.C attachPreprocessingInfoTraversal.C \
 	attributeListMap.C manglingSupport.C fixupCopy_scopes.C \
@@ -1105,10 +1112,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -1216,8 +1223,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1499,9 +1507,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1536,27 +1548,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1669,7 +1670,10 @@ AM_LFLAGS =
 # AM_CPPFLAGS = $(ROSE_INCLUDES) -I$(top_srcdir)/src/frontend/EDG_SAGE_Connection -I$(top_srcdir)/src/frontend/EDG/EDG_3.3/src
 # JJW 6-2-2008: We shouldn't be using anything from EDG outside these two directories
 # AM_CPPFLAGS = $(ROSE_INCLUDES) # -I$(top_srcdir)/src/frontend/EDG_SAGE_Connection -I$(top_srcdir)/src/frontend/EDG/EDG_3.3/src
-AM_CPPFLAGS = $(ROSE_INCLUDES) $(am__append_2)
+
+###Rasmussen:FIXME************************************
+AM_CPPFLAGS = $(ROSE_INCLUDES) $(am__append_3) \
+	-I$(top_srcdir)/src/frontend/Experimental_General_Language_Support
 
 # Copy the original lex file and the C++ file generated from it to the distribution
 # so that users don't have to find an appropriate version of lex (flex).  Flex should
@@ -1686,7 +1690,7 @@ AM_CPPFLAGS = $(ROSE_INCLUDES) $(am__append_2)
 EXTRA_DIST = CMakeLists.txt docs rtiHelpers.h attributeListMap.h \
 	advanced_preprocessing_hooks.h rose_attributes_list.h \
 	dwarfSupport.h sage3basic.hhh fileoffsetbits.h rosedll.h \
-	PolicyControl.txt Utf8.h $(am__append_3)
+	PolicyControl.txt Utf8.h $(am__append_4)
 CLEANFILES = haveRosettaGeneratedSource
 DISTCLEANFILES = preproc-c.cc ompparser.cc ompparser.h omplexer.cc
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@GENERATED_SOURCE = \
@@ -1752,7 +1756,7 @@ DISTCLEANFILES = preproc-c.cc ompparser.cc ompparser.h omplexer.cc
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	dwarfSupport.C \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	rose_graph_support.C \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(fSageSupport_la_sources) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_5)
 
 # Rasmussen (04/17/2019): Support for ATerms has been deprecated as it is no longer needed
 # and likely never fully implemented nor tested.  Files remain in the src tree but are no
@@ -1769,7 +1773,7 @@ DISTCLEANFILES = preproc-c.cc ompparser.cc ompparser.h omplexer.cc
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	fixupCopy_references.C \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	rose_graph_support.C \
 @ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(fSageSupport_la_sources) \
-@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_4)
+@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_5)
 
 # DQ (2/15/2010): This fails in Hudson tests of ROSE compiling ROSE for code generation, but I can't 
 # get it to fail in my own tests.  Skip it for now and see if there are more of these cases.
@@ -1794,8 +1798,8 @@ noinst_LTLIBRARIES = libsage3.la
 
 # libsage3_la_SOURCES = $(libsage3Sources) preproc.ll rose_paths.h omplexer.ll ompparser.yy
 # libsage3_la_SOURCES = $(libsage3Sources) preproc.ll omplexer.ll ompparser.yy
-libsage3_la_SOURCES = $(libsage3Sources) $(am__append_5) \
-	$(am__append_6)
+libsage3_la_SOURCES = $(libsage3Sources) $(am__append_6) \
+	$(am__append_7)
 
 # DQ (3/8/2009): I think that the dependence upon $(top_builddir)/rose_config.h 
 # is what was forcing a lot of files to be compiled after reruning configure.
@@ -1811,7 +1815,7 @@ nodist_libsage3_la_SOURCES = $(GENERATED_SOURCE)
 @ROSE_USE_BOOST_WAVE_FALSE@	astFromString/libAstFromString.la \
 @ROSE_USE_BOOST_WAVE_FALSE@	astHiddenTypeAndDeclarationLists/libastHiddenTypeAndDeclarationLists.la \
 @ROSE_USE_BOOST_WAVE_FALSE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_FALSE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_FALSE@	$(am__append_8)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@libsage3_la_LIBADD = astFixup/libastFixup.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astPostProcessing/libastPostProcessing.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astMerge/libastMerge.la \
@@ -1822,14 +1826,14 @@ nodist_libsage3_la_SOURCES = $(GENERATED_SOURCE)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astFromString/libAstFromString.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	astHiddenTypeAndDeclarationLists/libastHiddenTypeAndDeclarationLists.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_FALSE@	$(am__append_8)
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@libsage3_la_LIBADD = astFixup/libastFixup.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	astPostProcessing/libastPostProcessing.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	sageInterface/libsageInterface.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	astVisualization/libastVisualization.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	virtualCFG/libvirtualCFG.la \
 @ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	includeDirectivesProcessing/libincludeDirectivesProcessing.la \
-@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_7)
+@ROSE_USE_BOOST_WAVE_TRUE@@ROSE_USE_INTERNAL_FRONTEND_DEVELOPMENT_TRUE@	$(am__append_8)
 
 # DQ (2/11/2009): This is part of the support for Precompiled Headers (PCH) using GNU g++
 @ROSE_MPI_FALSE@@ROSE_PCH_TRUE@roseh_v_at_0 = @
@@ -1866,7 +1870,7 @@ nodist_pkginclude_HEADERS = \
    AstQueryMemoryPool.h \
    astFileIO/AstSpecificDataManagingClass.h
 
-BUILT_SOURCES = $(GENERATED_SOURCE) $(am__append_8)
+BUILT_SOURCES = $(GENERATED_SOURCE) $(am__append_9)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -2326,7 +2330,6 @@ uninstall-am: uninstall-nodist_pkgincludeHEADERS \
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"

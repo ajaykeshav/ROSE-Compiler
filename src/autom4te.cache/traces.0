@@ -1322,7 +1322,7 @@ fi
 AC_SUBST(GEN_BE)
 
 ])
-m4trace:config/ROSE.m4:7: -1- AC_DEFUN([ROSE_FLAG_CXX_OPTIONS], [
+m4trace:config/ROSE.m4:6: -1- AC_DEFUN([ROSE_FLAG_CXX_OPTIONS], [
 # Begin macro ROSE_FLAG_CXX.
 
 # We may be asked to guess the correct flags,
@@ -1376,11 +1376,56 @@ AC_MSG_NOTICE([after initialization: with_CXX_DEBUG = "$with_CXX_DEBUG"])
 # echo "Setting with_CXX_DEBUG to withval = $withval"
 # with_CXX_DEBUG=$withval
 
+# echo "OS_VENDOR_APPLE = $OS_VENDOR_APPLE"
+# echo "OS_vendor = $OS_vendor"
+
+# if "x$OS_vendor" == "xapple"; then
+#    echo "This IS a Mac OSX machine (even though we call the g++ compiler (which is really clang), CXX resolves to clang): Cxx = $CXX"
+# else
+#    echo "This is NOT a Mac OSX machine"
+# fi
+
+# echo "FRONTEND_CXX_VERSION_MAJOR = $FRONTEND_CXX_VERSION_MAJOR"
+
+# if test $FRONTEND_CXX_COMPILER_VENDOR == "gnu" && test $FRONTEND_CXX_VERSION_MAJOR -ge 5; then
+# if test "x$FRONTEND_CXX_COMPILER_VENDOR" = "xgnu" && test $FRONTEND_CXX_VERSION_MAJOR -ge 5; then
+if test "x$FRONTEND_CXX_COMPILER_VENDOR" = "xgnu" ; then
+   AC_MSG_NOTICE([using additional GNU compiler options: -fno-var-tracking-assignments -Wno-misleading-indentation])
+else
+   AC_MSG_NOTICE([skip using additional GNU compiler options: -fno-var-tracking-assignments -Wno-misleading-indentation])
+fi
+
 if test "x$with_CXX_DEBUG" = "xyes"; then
 # CXX_DEBUG was activated but not specified, so set it.
   AC_MSG_NOTICE([using default options for maximal debug (true case)])
   case $CXX in
     g++)
+    # DQ (9/18/2020): The reason we can't use these options is because the MacOSX compiler is clang,
+    # but it calls itself g++, and we need to figure out how to tell with the g++ is acutally clang 
+    # so that we can suppress these options in just that case.
+    # DQ (9/17/2020): We can't use these option until we use more modern compilers than 4.8.5 in Jenkins.
+    # DQ (9/16/2020): Adding -fno-var-tracking-asignment -fno-misleading-indentation -wfatal-errors
+    # CXX_DEBUG="-g"
+    # CXX_DEBUG="-g -fno-var-tracking-asignment -fno-misleading-indentation"
+    # CXX_DEBUG="-g -fno-misleading-indentation"
+    # CXX_DEBUG="-g -Wno-misleading-indentation"
+    # CXX_DEBUG="-g -fno-var-tracking-assignments"
+    # CXX_DEBUG="-g -fno-var-tracking-assignments -Wno-misleading-indentation"
+    # CXX_DEBUG="-g -fno-var-tracking-assignments -Wno-misleading-indentation"
+    # CXX_DEBUG="-g"
+    # DQ (9/20/20): We need to make sure that where the Clang compiler on MacOSX pretends to be 
+    # the GNU compiler that we don't use some GNU options that are an error when used with Clang.
+    # if test $FRONTEND_CXX_COMPILER_VENDOR == "gnu" && test $FRONTEND_CXX_VERSION_MAJOR -ge 5; then
+    # if test $FRONTEND_CXX_COMPILER_VENDOR == "gnu" ; then
+      if test "x$FRONTEND_CXX_COMPILER_VENDOR" == "xgnu" && test $FRONTEND_CXX_VERSION_MAJOR -ge 5; then
+         AC_MSG_NOTICE([using additional GNU compiler options: -fno-var-tracking-assignments -Wno-misleading-indentation])
+         CXX_DEBUG="-g -fno-var-tracking-assignments -Wno-misleading-indentation"
+      else
+         AC_MSG_NOTICE([skip using additional GNU compiler options (likely clang trying to look like g++ on MaxOSX): -fno-var-tracking-assignments -Wno-misleading-indentation])
+         CXX_DEBUG="-g"
+      fi
+      ;;
+    clang++)
       CXX_DEBUG="-g"
       ;;
     icpc)
@@ -1402,6 +1447,9 @@ elif test "x$with_CXX_DEBUG" = "xno"; then
   AC_MSG_NOTICE([using at least some default (minimal) options for debug flags (currently the same as above) (false case)])
   case $CXX in
     g++)
+      CXX_DEBUG=""
+      ;;
+    clang++)
       CXX_DEBUG=""
       ;;
     icpc)
@@ -1427,8 +1475,9 @@ AC_SUBST(CXX_DEBUG)
 if test -n "$CXX_DEBUG"; then CXXFLAGS="$CXXFLAGS $CXX_DEBUG"; fi
 
 # echo "Am I set: CXX_DEBUG= $CXX_DEBUG"
-# echo "CXXFLAGS currently set to $CXXFLAGS"
+AC_MSG_NOTICE([CXXFLAGS currently set to $CXXFLAGS])
 
+# exit 1
 
 dnl *********************************************************************
 dnl * Set the C++ compiler optimization flags in CXXOPT
@@ -1607,7 +1656,7 @@ AC_MSG_NOTICE([CXX_WARNINGS = "$CXX_WARNINGS"])
 
 # End macro ROSE_FLAG_CXX_OPTIONS.
 ])
-m4trace:config/ROSE.m4:299: -1- AC_DEFUN([ROSE_FLAG_C_OPTIONS], [
+m4trace:config/ROSE.m4:347: -1- AC_DEFUN([ROSE_FLAG_C_OPTIONS], [
 # Begin macro ROSE_FLAG_C_OPTIONS.
 
 # We may be asked to guess the correct flags,
@@ -1661,6 +1710,9 @@ if test "x$with_C_DEBUG" = "xyes"; then
     gcc)
       C_DEBUG="-g"
       ;;
+    clang)
+      C_DEBUG="-g"
+      ;;
     icc)
       C_DEBUG="-g"
       ;;
@@ -1680,6 +1732,9 @@ elif test "x$with_C_DEBUG" = "xno"; then
   AC_MSG_NOTICE([using at least some default (minimal) options for debug flags (currently the same as above) (false case)])
   case $CC in
     gcc)
+      C_DEBUG=""
+      ;;
+    clang)
       C_DEBUG=""
       ;;
     icc)
@@ -1849,7 +1904,7 @@ AC_MSG_NOTICE([CXX_WARNINGS = "$CXX_WARNINGS"])
 
 # End macro ROSE_FLAG_C_OPTIONS.
 ])
-m4trace:config/ROSE.m4:547: -1- AC_DEFUN([ROSE_CXX_HEADER_OPTIONS], [
+m4trace:config/ROSE.m4:601: -1- AC_DEFUN([ROSE_CXX_HEADER_OPTIONS], [
 # Begin macro ROSE_CXX_HEADER_OPTIONS.
 
 # DQ (1/15/2007): This is an older discontinued option (when we used to package a 
@@ -1893,7 +1948,7 @@ export ROSE_CXX_HEADERS_DIR
 # AC_SUBST(ROSE_CXX_HEADERS_DIR)
 
 ])
-m4trace:config/ROSE.m4:596: -1- AC_DEFUN([ROSE_C_HEADER_OPTIONS], [
+m4trace:config/ROSE.m4:650: -1- AC_DEFUN([ROSE_C_HEADER_OPTIONS], [
 # Begin macro ROSE_C_HEADER_OPTIONS.
 
 # DQ (1/15/2007): This is an older discontinued option (when we used to package a 
@@ -1937,7 +1992,7 @@ export ROSE_C_HEADERS_DIR
 # AC_SUBST(ROSE_C_HEADERS_DIR)
 
 ])
-m4trace:config/ROSE.m4:643: -1- AC_DEFUN([ROSE_SUPPORT_LONG_MAKE_CHECK_RULE], [
+m4trace:config/ROSE.m4:697: -1- AC_DEFUN([ROSE_SUPPORT_LONG_MAKE_CHECK_RULE], [
 # Begin macro ROSE_TESTING_OPTIONS.
 
 # This macro defines short and long versions of internla testing
@@ -5850,6 +5905,8 @@ m4trace:config/compiler-defs.m4:402: -1- AC_DEFUN([GET_COMPILER_SPECIFIC_DEFINES
     dnl --- Characteristics of the frontend compiler ---
     dnl ------------------------------------------------
 
+AC_MSG_NOTICE([START: Setup characteristics of the frontend compiler])
+
     ROSE_CONFIGURE_SECTION([Checking frontend compiler])
     GET_CXX_VERSION_INFO([$CXX], [$FRONTEND_CXX_COMPILER_VENDOR])
     GET_CXX_VERSION_MACROS
@@ -6036,6 +6093,9 @@ m4trace:config/compiler-defs.m4:402: -1- AC_DEFUN([GET_COMPILER_SPECIFIC_DEFINES
     AC_SUBST(BACKEND_COMPILER_VERSION_MAJOR_NUMBER)
     AC_SUBST(BACKEND_COMPILER_VERSION_MINOR_NUMBER)
     AC_SUBST(BACKEND_COMPILER_VERSION_PATCHLEVEL_NUMBER)
+
+AC_MSG_NOTICE([END: Setup characteristics of the frontend compiler])
+AC_MSG_NOTICE([ --- FRONTEND_CXX_VERSION_MAJOR = $FRONTEND_CXX_VERSION_MAJOR])
 
 ])
 m4trace:config/determine-os.m4:16: -1- AC_DEFUN([DETERMINE_OS], [
@@ -9374,7 +9434,7 @@ m4trace:config/support-blacklist.m4:4: -1- AC_DEFUN([ROSE_SUPPORT_BLACKLIST], [
         if test "$rose_boost_version" -ge 106100 -a "$rose_boost_version" -le 106300 -a \
                 "$FRONTEND_CXX_COMPILER_VENDOR" = "intel" -a \
                 "$support_binaries_frontend" = "yes"; then
-            prohibited="binary analysis enabled with boost 1.62 with Intel compiler"
+            prohibited="binary analysis enabled with boost 1.61 through 1.63 with Intel compiler"
             break
         fi
 
@@ -12668,6 +12728,7 @@ if test "x$enable_lcov" = "xyes"; then
     g++)
       CXXFLAGS+=" -g -fprofile-arcs -ftest-coverage"
       CFLAGS+=" -g -fprofile-arcs -ftest-coverage"
+      LDFLAGS+=" -lgcov --coverage"
       ;;
     clang)
     # For LLVM the support for lcov .
@@ -14522,16 +14583,19 @@ AC_LANG(C++)
 AX_COMPILER_VENDOR
 FRONTEND_CXX_COMPILER_VENDOR="$ax_cv_cxx_compiler_vendor"
 
-# echo "_AC_LANG_ABBREV              = $_AC_LANG_ABBREV"
-# echo "ax_cv_c_compiler_vendor      = $ax_cv_c_compiler_vendor"
-# echo "ax_cv_cxx_compiler_vendor    = $ax_cv_cxx_compiler_vendor"
+# DQ (10/27/2020): Fixed to avoid output spew.
+AC_MSG_NOTICE([_AC_LANG_ABBREV              = "$_AC_LANG_ABBREV"])
+AC_MSG_NOTICE([ax_cv_c_compiler_vendor      = "$ax_cv_c_compiler_vendor"])
+AC_MSG_NOTICE([ax_cv_cxx_compiler_vendor    = $ax_cv_cxx_compiler_vendor"])
+
 AC_MSG_NOTICE([FRONTEND_CXX_COMPILER_VENDOR = "$FRONTEND_CXX_COMPILER_VENDOR"])
 
 unset ax_cv_cxx_compiler_vendor
 
+# DQ (9/20/20): Moving the setup of compiler flags to after the macros that define the compiler versions are computed.
 # Setup default options for C and C++ compilers compiling ROSE source code.
-ROSE_FLAG_C_OPTIONS
-ROSE_FLAG_CXX_OPTIONS
+# ROSE_FLAG_C_OPTIONS
+# ROSE_FLAG_CXX_OPTIONS
 
 # echo "Exiting after computing the frontend compiler vendor"
 # exit 1
@@ -14819,7 +14883,7 @@ ROSE_SUPPORT_FATAL_WARNINGS
 # End macro ROSE_SUPPORT_ROSE_PART_1.
 
 ])
-m4trace:config/support-rose.m4:821: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_BUILD_INCLUDE_FILES], [
+m4trace:config/support-rose.m4:824: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_BUILD_INCLUDE_FILES], [
 # Begin macro ROSE_SUPPORT_ROSE_BUILD_INCLUDE_FILES.
 
 AC_MSG_NOTICE([in ROSE SUPPORT ROSE BUILD INCLUDE FILES: Using back-end C++ compiler = "$BACKEND_CXX_COMPILER" compiler vendor name = "$ax_cv_cxx_compiler_vendor" for processing of unparsed source files from ROSE preprocessors])
@@ -14857,7 +14921,7 @@ fi
 # *****************************************************************
 
 ])
-m4trace:config/support-rose.m4:869: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_2], [
+m4trace:config/support-rose.m4:872: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_2], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_2.
 
 # DQ (9/26/2015): Since the config/ltdl.m4 file in regenerated, we can't edit it easily.
@@ -14875,6 +14939,11 @@ AC_MSG_NOTICE([in configure.in ... CXX = "$CXX"])
 # upon the selection of the back-end compiler.
 GET_COMPILER_SPECIFIC_DEFINES
 ROSE_CONFIG_TOKEN="$ROSE_CONFIG_TOKEN $FRONTEND_CXX_COMPILER_VENDOR-$FRONTEND_CXX_VERSION_MAJOR.$FRONTEND_CXX_VERSION_MINOR"
+
+# DQ (9/20/20): Moving the setup of compiler flags to after the macros that define the compiler versions are computed.
+# Setup default options for C and C++ compilers compiling ROSE source code.
+ROSE_FLAG_C_OPTIONS
+ROSE_FLAG_CXX_OPTIONS
 
 # This must go after the setup of the headers options
 # Setup the CXX_INCLUDE_STRING to be used by EDG to find the correct headers
@@ -15721,7 +15790,7 @@ rm -rf Templates.DB
 # End macro ROSE_SUPPORT_ROSE_PART_2.
 
 ])
-m4trace:config/support-rose.m4:1738: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_3], [
+m4trace:config/support-rose.m4:1746: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_3], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_3.
 
 ## Setup the EDG specific stuff
@@ -15744,7 +15813,7 @@ AC_SUBST(build_triplet_without_redhat) dnl This is done even with EDG source, si
 
 # End macro ROSE_SUPPORT_ROSE_PART_3.
 ])
-m4trace:config/support-rose.m4:1765: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_4], [
+m4trace:config/support-rose.m4:1773: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_4], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_4.
 
 dnl ---------------------------------------------------------------------
@@ -15908,7 +15977,7 @@ AC_DEFINE(CONFIG_ROSE, 1, [Always defined and used for checking whether global C
 # End macro ROSE_SUPPORT_ROSE_PART_4.
 
 ])
-m4trace:config/support-rose.m4:1940: -1- AC_DEFUN([CLASSPATH_COND_IF], [m4_ifdef([AM_COND_IF],
+m4trace:config/support-rose.m4:1948: -1- AC_DEFUN([CLASSPATH_COND_IF], [m4_ifdef([AM_COND_IF],
   [AM_COND_IF([$1], [$3], [$4])],
   [if $2; then
      m4_default([$3], [:])
@@ -15916,7 +15985,7 @@ m4trace:config/support-rose.m4:1940: -1- AC_DEFUN([CLASSPATH_COND_IF], [m4_ifdef
      m4_default([$4], [:])
    fi
 ])])
-m4trace:config/support-rose.m4:1952: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_5], [
+m4trace:config/support-rose.m4:1960: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_5], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_5.
 
 # DQ (9/21/2009): Debugging for RH release 5
@@ -15957,7 +16026,7 @@ src/frontend/CxxFrontend/EDG/edgRose/Makefile
 # End macro ROSE_SUPPORT_ROSE_PART_5.
 
 ])
-m4trace:config/support-rose.m4:1997: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_6], [
+m4trace:config/support-rose.m4:2005: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_6], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_6.
 
 # RV 9/14/2005: Removed src/3rdPartyLibraries/PDFLibrary/Makefile
@@ -16178,6 +16247,9 @@ src/frontend/Experimental_OpenFortranParser_ROSE_Connection/Makefile
 src/frontend/Experimental_Flang_ROSE_Connection/Makefile
 src/frontend/Experimental_Csharp_ROSE_Connection/Makefile
 src/frontend/Experimental_Ada_ROSE_Connection/Makefile
+src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/Makefile
+src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/Makefile
+src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/ada_main/Makefile
 src/frontend/Experimental_Jovial_ROSE_Connection/Makefile
 src/frontend/Experimental_Cobol_ROSE_Connection/Makefile
 src/frontend/Experimental_Matlab_ROSE_Connection/Makefile
@@ -16335,6 +16407,8 @@ tests/nonsmoke/functional/CompileTests/Java_tests/Makefile
 tests/nonsmoke/functional/CompileTests/Java_tests/unit_tests/Makefile
 tests/nonsmoke/functional/CompileTests/experimental_csharp_tests/Makefile
 tests/nonsmoke/functional/CompileTests/experimental_ada_tests/Makefile
+tests/nonsmoke/functional/CompileTests/experimental_ada_tests/dot_asis_tests/Makefile
+tests/nonsmoke/functional/CompileTests/experimental_ada_tests/compile_tests/Makefile
 tests/nonsmoke/functional/CompileTests/experimental_fortran_tests/Makefile
 tests/nonsmoke/functional/CompileTests/experimental_jovial_tests/Makefile
 tests/nonsmoke/functional/CompileTests/experimental_cobol_tests/Makefile
@@ -16551,7 +16625,7 @@ tutorial/roseHPCT/Makefile
 # End macro ROSE_SUPPORT_ROSE_PART_6.
 
 ])
-m4trace:config/support-rose.m4:2597: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_7], [
+m4trace:config/support-rose.m4:2610: -1- AC_DEFUN([ROSE_SUPPORT_ROSE_PART_7], [
 # Begin macro ROSE_SUPPORT_ROSE_PART_7.
 
 AC_CONFIG_COMMANDS([default],
@@ -16672,12 +16746,18 @@ if test "x$enable_sanitizer" = "xyes"; then
   case $CXX in
     g++)
     # For GNU the support for sanitizer captured using a single options (I think).
-      CXXFLAGS+=" -fsanitize=address"
-      CFLAGS+=" -fsanitize=address"
+    # DQ (9/16/2020): Using -fsanitize-recover=address instead of -fsanitize=address
+    # then we can use the environment variable ASAN_OPTIONS=halt_on_error=0:detect_leaks=0 
+    # CXXFLAGS+=" -fsanitize=address"
+    # CFLAGS+=" -fsanitize=address"
+      CXXFLAGS+=" -fsanitize=address -fsanitize-recover=address"
+      CFLAGS+=" -fsanitize=address -fsanitize-recover=address"
       ;;
     clang)
     # For LLVM the support for sanitizer is the best (but add this later).
-      AC_MSG_NOTICE([Clang compilers do support sanitizer tools (but support in ROSE not implemented)])
+    # AC_MSG_NOTICE([Clang compilers do support sanitizer tools (but support in ROSE not implemented)])
+      CXXFLAGS+=" -fsanitize=address -fsanitize-recover=address"
+      CFLAGS+=" -fsanitize=address -fsanitize-recover=address"
       ;;
     icpc)
     # For Intel turn on 64bit migration/portability warnings
@@ -18602,17 +18682,6 @@ m4trace:configure.ac:121: -1- m4_pattern_allow([^host_cpu$])
 m4trace:configure.ac:121: -1- m4_pattern_allow([^host_vendor$])
 m4trace:configure.ac:121: -1- m4_pattern_allow([^host_os$])
 m4trace:configure.ac:121: -1- AX_COMPILER_VENDOR
-m4trace:configure.ac:121: -1- ROSE_FLAG_C_OPTIONS
-m4trace:configure.ac:121: -1- m4_pattern_allow([^C_DEBUG$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^C_OPTIMIZE$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^C_WARNINGS$])
-m4trace:configure.ac:121: -1- ROSE_FLAG_CXX_OPTIONS
-m4trace:configure.ac:121: -1- ROSE_COMPILER_FEATURES([c++], [$CXX $CPPFLAGS $CXXFLAGS], [HOST_CXX_])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^CXX_DEBUG$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^CXX_OPTIMIZE$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^CXX_WARNINGS$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^CXX_TEMPLATE_REPOSITORY_PATH$])
-m4trace:configure.ac:121: -1- m4_pattern_allow([^CXX_TEMPLATE_OBJECTS$])
 m4trace:configure.ac:121: -1- AM_CONDITIONAL([ROSE_USE_UNIFORM_ADVANCED_WARNINGS_SUPPORT], [test "x$enable_advanced_warnings" = xyes])
 m4trace:configure.ac:121: -1- m4_pattern_allow([^ROSE_USE_UNIFORM_ADVANCED_WARNINGS_SUPPORT_TRUE$])
 m4trace:configure.ac:121: -1- m4_pattern_allow([^ROSE_USE_UNIFORM_ADVANCED_WARNINGS_SUPPORT_FALSE$])
@@ -19580,6 +19649,17 @@ m4trace:configure.ac:139: -1- m4_pattern_allow([^BACKEND_COMPILER_VERSION_NAME$]
 m4trace:configure.ac:139: -1- m4_pattern_allow([^BACKEND_COMPILER_VERSION_MAJOR_NUMBER$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^BACKEND_COMPILER_VERSION_MINOR_NUMBER$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^BACKEND_COMPILER_VERSION_PATCHLEVEL_NUMBER$])
+m4trace:configure.ac:139: -1- ROSE_FLAG_C_OPTIONS
+m4trace:configure.ac:139: -1- m4_pattern_allow([^C_DEBUG$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^C_OPTIMIZE$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^C_WARNINGS$])
+m4trace:configure.ac:139: -1- ROSE_FLAG_CXX_OPTIONS
+m4trace:configure.ac:139: -1- ROSE_COMPILER_FEATURES([c++], [$CXX $CPPFLAGS $CXXFLAGS], [HOST_CXX_])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_DEBUG$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_OPTIMIZE$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_WARNINGS$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_TEMPLATE_REPOSITORY_PATH$])
+m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_TEMPLATE_OBJECTS$])
 m4trace:configure.ac:139: -1- ROSE_CONFIGURE_SECTION([Checking backend C/C++ compiler specific references])
 m4trace:configure.ac:139: -1- SETUP_BACKEND_C_COMPILER_SPECIFIC_REFERENCES
 m4trace:configure.ac:139: -1- m4_pattern_allow([^C_INCLUDE_STRING$])
@@ -19596,12 +19676,12 @@ m4trace:configure.ac:139: -1- m4_pattern_allow([^XML2_CONFIG$])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_TRY_RUN' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:2775: AC_TRY_RUN is expanded from...
 config/libxml.m4:12: AM_PATH_XML2 is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_TRY_LINK' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:2698: AC_TRY_LINK is expanded from...
 config/libxml.m4:12: AM_PATH_XML2 is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^XML_CPPFLAGS$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^XML_LIBS$])
@@ -19658,13 +19738,13 @@ m4trace:configure.ac:139: -1- ROSE_REAL_ARG_WITH([valgrind-lib], [if the Valgrin
   ], [ROSE_WITH_VALGRIND_LIB])
 m4trace:configure.ac:139: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-valgrind.m4:19: ROSE_SUPPORT_VALGRIND is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- ROSE_MSG_ERROR([valgrind binary is missing, can't configure with Valgrind])
 m4trace:configure.ac:139: -1- ROSE_MSG_ERROR([could not execute your Valgrind binary])
 m4trace:configure.ac:139: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-valgrind.m4:19: ROSE_SUPPORT_VALGRIND is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- ROSE_MSG_ERROR([valgrind.h is missing, can't compile with Valgrind])
 m4trace:configure.ac:139: -1- AM_CONDITIONAL([ROSE_WITH_VALGRIND], [test "x$VALGRIND_BIN_PATH" != "x"])
@@ -19716,7 +19796,7 @@ You should run autoupdate.], [../../lib/autoconf/oldnames.m4:34: AC_ERROR is exp
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/libs.m4:99: AC_CHECK_LIB is expanded from...
 config/support-maple.m4:1: ROSE_SUPPORT_MAPLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^MAPLE_INCLUDES$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^MAPLE_LIBS$])
@@ -19769,7 +19849,7 @@ m4trace:configure.ac:139: -1- ROSE_REAL_ARG_WITH([aterm-lib], [if the ATERM comp
   ], [ROSE_WITH_ATERM_LIB])
 m4trace:configure.ac:139: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-aterm.m4:52: ROSE_SUPPORT_ATERM is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- ROSE_MSG_ERROR([bin directory is missing, can't use this ATERM installation])
 m4trace:configure.ac:139: -1- AM_CONDITIONAL([ROSE_WITH_ATERM], [test "x$ATERM_BIN_PATH" != "x" && test "x$ATERM_LIBRARY_PATH" != "x"])
@@ -19815,7 +19895,7 @@ m4trace:configure.ac:139: -1- ROSE_REAL_ARG_WITH([stratego-lib], [if the STRATEG
   ], [ROSE_WITH_STRATEGO_LIB])
 m4trace:configure.ac:139: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-stratego.m4:51: ROSE_SUPPORT_STRATEGO is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- ROSE_MSG_ERROR([bin directory is missing, can't use this STRATEGO installation])
 m4trace:configure.ac:139: -1- AM_CONDITIONAL([ROSE_WITH_STRATEGO], [test "x$STRATEGO_BIN_PATH" != "x" && test "x$STRATEGO_LIBRARY_PATH" != "x"])
@@ -19952,7 +20032,7 @@ You should run autoupdate.], [../../lib/autoconf/lang.m4:125: AC_LANG_SAVE is ex
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LANG_C' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/c.m4:72: AC_LANG_C is expanded from...
@@ -19962,7 +20042,7 @@ You should run autoupdate.], [../../lib/autoconf/c.m4:72: AC_LANG_C is expanded 
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_MSG' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is expanded from...
@@ -19972,7 +20052,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is ex
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_MSG' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is expanded from...
@@ -19982,7 +20062,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is ex
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_MSG' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is expanded from...
@@ -19992,7 +20072,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:384: AC_FD_MSG is ex
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/lang.m4:134: AC_LANG_RESTORE is expanded from...
@@ -20002,7 +20082,7 @@ You should run autoupdate.], [../../lib/autoconf/lang.m4:134: AC_LANG_RESTORE is
 config/mdl_have_opengl_2014.m4:1: AC_FIND_OPENGL is expanded from...
 ../../lib/m4sugar/m4sh.m4:639: AS_IF is expanded from...
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^GL_CFLAGS$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^GL_LIBS$])
@@ -20206,7 +20286,7 @@ m4trace:configure.ac:139: -1- m4_pattern_allow([^OPENCL_LIB_DIR$])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_ERROR' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/oldnames.m4:34: AC_ERROR is expanded from...
 config/support-accelerator.m4:55: ROSE_CHECK_OPENCL is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- AM_CONDITIONAL([ROSE_HAVE_OPENCL_LIB], [test "$with_opencl_lib" != ""])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^ROSE_HAVE_OPENCL_LIB_TRUE$])
@@ -20247,14 +20327,14 @@ m4trace:configure.ac:139: -1- AC_DISABLE_STATIC
 m4trace:configure.ac:139: -1- LT_AC_PROG_SED
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `LT_AC_PROG_SED' is obsolete.
 You should run autoupdate.], [config/libtool.m4:8295: LT_AC_PROG_SED is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^SED$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([LT_LIBEXT])
 m4trace:configure.ac:139: -1- AC_PROG_LIBTOOL
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_PROG_LIBTOOL' is obsolete.
 You should run autoupdate.], [config/libtool.m4:99: AC_PROG_LIBTOOL is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- LT_INIT
 m4trace:configure.ac:139: -1- m4_pattern_forbid([^_?LT_[A-Z_]+$])
@@ -20361,7 +20441,7 @@ m4trace:configure.ac:139: -1- m4_pattern_allow([^LT_SYS_LIBRARY_PATH$])
 m4trace:configure.ac:139: -1- AC_LIBLTDL_CONVENIENCE
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LIBLTDL_CONVENIENCE' is obsolete.
 You should run autoupdate.], [config/ltdl.m4:81: AC_LIBLTDL_CONVENIENCE is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^LIBLTDL$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^LTDLDEPS$])
@@ -20372,16 +20452,16 @@ m4trace:configure.ac:139: -1- m4_pattern_allow([^LIBLTDL$])
 m4trace:configure.ac:139: -1- AC_LIBTOOL_DLOPEN
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LIBTOOL_DLOPEN' is obsolete.
 You should run autoupdate.], [config/ltoptions.m4:113: AC_LIBTOOL_DLOPEN is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [AC_LIBTOOL_DLOPEN: Remove this warning and the call to _LT_SET_OPTION when you
 put the 'dlopen' option into LT_INIT's first parameter.], [config/ltoptions.m4:113: AC_LIBTOOL_DLOPEN is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- AC_LIB_LTDL([recursive])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LIB_LTDL' is obsolete.
 You should run autoupdate.], [config/ltdl.m4:352: AC_LIB_LTDL is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- LTDL_INIT([recursive])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^LIBLTDL$])
@@ -20430,7 +20510,7 @@ http://www.gnu.org/software/autoconf/manual/autoconf.html#Expanded-Before-Requir
 config/ltdl.m4:367: _LTDL_SETUP is expanded from...
 config/ltdl.m4:226: LTDL_INIT is expanded from...
 config/ltdl.m4:352: AC_LIB_LTDL is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _LT_COMPILER_OPTION([if $compiler PIC flag $_LT_TAGVAR(lt_prog_compiler_pic, ) works], [_LT_TAGVAR(lt_cv_prog_compiler_pic_works, )], [$_LT_TAGVAR(lt_prog_compiler_pic, )@&t@m4_if([],[],[ -DPIC],[m4_if([],[CXX],[ -DPIC],[])])], [], [case $_LT_TAGVAR(lt_prog_compiler_pic, ) in
      "" | " "*) ;;
@@ -20484,13 +20564,13 @@ m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LANG_SAVE' is 
 You should run autoupdate.], [../../lib/autoconf/lang.m4:125: AC_LANG_SAVE is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/c.m4:252: AC_LANG_CPLUSPLUS is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([CXXP is $CXX])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20498,7 +20578,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([CXXCPP is $CXXCPP])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20506,7 +20586,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is sunpro])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20514,7 +20594,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is gnu])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20522,7 +20602,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is dec])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20530,7 +20610,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is kai])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20538,7 +20618,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is sgi])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20546,7 +20626,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG([checking if $CXX is xlc])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
@@ -20554,13 +20634,13 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is exp
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/lang.m4:134: AC_LANG_RESTORE is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG_VAR([CXX_ID CXX_VERSION])
 m4trace:configure.ac:139: -1- BTNG_AC_LOG(["$btng_log_vars_index is $btng_log_vars_value"])
@@ -20570,7 +20650,7 @@ acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
 acmacros/configure-log.m4:3: BTNG_AC_LOG_VAR is expanded from...
 acmacros/compiler-id.m4:38: BTNG_INFO_CXX_ID_NAMES is expanded from...
 acmacros/compiler-id.m4:15: BTNG_INFO_CXX_ID is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- ROSE_SUPPORT_PURIFY
 m4trace:configure.ac:139: -1- m4_pattern_allow([^USE_PURIFY$])
@@ -20621,7 +20701,7 @@ m4trace:configure.ac:139: -1- BTNG_AC_LOG([CXX_SHARED_LIB_UPDATE changed to $CXX
 m4trace:configure.ac:139: -1- _m4_warn([obsolete], [The macro `AC_FD_CC' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:383: AC_FD_CC is expanded from...
 acmacros/configure-log.m4:1: BTNG_AC_LOG is expanded from...
-config/support-rose.m4:869: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
+config/support-rose.m4:872: ROSE_SUPPORT_ROSE_PART_2 is expanded from...
 configure.ac:139: the top level])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_STATIC_LIB_UPDATE$])
 m4trace:configure.ac:139: -1- m4_pattern_allow([^CXX_SHARED_LIB_UPDATE$])
@@ -20636,7 +20716,7 @@ m4trace:configure.ac:140: -1- m4_pattern_allow([^__CHAR_UNSIGNED__$])
 m4trace:configure.ac:140: -1- _m4_warn([obsolete], [The macro `AC_C_LONG_DOUBLE' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/types.m4:452: AC_C_LONG_DOUBLE is expanded from...
 config/EDG.m4:1: SETUP_EDG is expanded from...
-config/support-rose.m4:1738: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
+config/support-rose.m4:1746: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
 configure.ac:140: the top level])
 m4trace:configure.ac:140: -1- m4_pattern_allow([^HAVE_LONG_DOUBLE_WIDER$])
 m4trace:configure.ac:140: -1- m4_pattern_allow([^HAVE_LONG_DOUBLE$])
@@ -20660,12 +20740,12 @@ m4trace:configure.ac:140: -1- m4_pattern_allow([^HAVE_GETPAGESIZE$])
 m4trace:configure.ac:140: -1- m4_pattern_allow([^HAVE_MMAP$])
 m4trace:configure.ac:140: -1- _m4_warn([obsolete], [The macro `AC_FUNC_SETVBUF_REVERSED' is obsolete.  Remove it and all references to SETVBUF_REVERSED.], [../../lib/autoconf/functions.m4:1712: AC_FUNC_SETVBUF_REVERSED is expanded from...
 config/EDG.m4:1: SETUP_EDG is expanded from...
-config/support-rose.m4:1738: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
+config/support-rose.m4:1746: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
 configure.ac:140: the top level])
 m4trace:configure.ac:140: -1- _m4_warn([obsolete], [The macro `AC_TYPE_SIGNAL' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/types.m4:746: AC_TYPE_SIGNAL is expanded from...
 config/EDG.m4:1: SETUP_EDG is expanded from...
-config/support-rose.m4:1738: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
+config/support-rose.m4:1746: ROSE_SUPPORT_ROSE_PART_3 is expanded from...
 configure.ac:140: the top level])
 m4trace:configure.ac:140: -1- m4_pattern_allow([^RETSIGTYPE$])
 m4trace:configure.ac:140: -1- m4_pattern_allow([^HAVE_STRCOLL$])
@@ -20686,7 +20766,7 @@ m4trace:configure.ac:141: -1- m4_pattern_allow([^TIME_WITH_SYS_TIME$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^HAVE_HRTIME_T$])
 m4trace:configure.ac:141: -1- _m4_warn([obsolete], [The macro `AC_TRY_LINK' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:2698: AC_TRY_LINK is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^HAVE__RTC$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^top_pwd$])
@@ -20698,7 +20778,7 @@ m4trace:configure.ac:141: -1- ACROSE_ENABLE_ROSEHPCT
 m4trace:configure.ac:141: -2- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:207: AC_HELP_STRING is expanded from...
 config/enable-rosehpct.m4:21: ACROSE_ENABLE_ROSEHPCT is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- ACROSE_CHECK_ROSEHPCT([], [acrose_enable_rosehpct=no])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSEHPCT_DEP_INCLUDES$])
@@ -20776,7 +20856,7 @@ m4trace:configure.ac:141: -1- _m4_warn([syntax], [AC_LANG_CONFTEST: no AC_LANG_S
 ../../lib/autoconf/general.m4:2063: AC_CACHE_CHECK is expanded from...
 config/ax_boost_serialization.m4:32: AX_BOOST_SERIALIZATION is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^HAVE_BOOST_SERIALIZATION$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^HAVE_BOOST_SERIALIZATION_LIB$])
@@ -20806,7 +20886,7 @@ m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_YICES$])
 m4trace:configure.ac:141: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-yices.m4:2: ROSE_SUPPORT_YICES is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBYICES$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_YICES$])
@@ -20854,7 +20934,7 @@ m4trace:configure.ac:141: -1- ROSE_REAL_ARG_WITH([libreadline-lib], [if the GNU 
 m4trace:configure.ac:141: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-readline.m4:3: ROSE_SUPPORT_LIBREADLINE is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- ROSE_MSG_ERROR([libreadline.h is missing; use --with-libreadline=no to disable])
 m4trace:configure.ac:141: -1- ROSE_MSG_ERROR([libreadline.a is missing; use --with-libreadline=no to disable])
@@ -20879,7 +20959,7 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:207: AC_HELP_STRING 
 ../../lib/autoconf/general.m4:1473: AC_ARG_ENABLE is expanded from...
 config/support-i386.m4:4: ROSE_SUPPORT_I386 is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- AM_CONDITIONAL([ENABLE_I386], [test "$ac_cv_enable_i386" != no])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ENABLE_I386_TRUE$])
@@ -20907,7 +20987,7 @@ m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBELF$])
 m4trace:configure.ac:141: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-elf.m4:2: ROSE_SUPPORT_ELF is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBELF$])
 m4trace:configure.ac:141: -1- AM_CONDITIONAL([ROSE_HAVE_LIBELF], [test -n "$ROSE_HAVE_LIBELF"])
@@ -20923,7 +21003,7 @@ m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBDWARF$])
 m4trace:configure.ac:141: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-dwarf.m4:2: ROSE_SUPPORT_DWARF is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBDWARF$])
 m4trace:configure.ac:141: -1- AM_CONDITIONAL([ROSE_HAVE_LIBDWARF], [test -n "$ROSE_HAVE_LIBDWARF"])
@@ -20946,7 +21026,7 @@ m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBGCRYPT$])
 m4trace:configure.ac:141: -1- _m4_warn([cross], [cannot check for file existence when cross compiling], [../../lib/autoconf/general.m4:2788: AC_CHECK_FILE is expanded from...
 config/support-gcrypt.m4:1: ROSE_SUPPORT_LIBGCRYPT is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBGCRYPT$])
 m4trace:configure.ac:141: -1- AM_CONDITIONAL([ROSE_HAVE_LIBGCRYPT], [test -n "$ROSE_HAVE_LIBGCRYPT"])
@@ -20972,7 +21052,7 @@ m4trace:configure.ac:141: -1- _m4_warn([obsolete], [The macro `AC_CHECKING' is o
 You should run autoupdate.], [../../lib/autoconf/general.m4:2277: AC_CHECKING is expanded from...
 config/support-libpqxx.m4:2: ROSE_SUPPORT_LIBPQXX is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_LIBPQXX$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_LIBPQXX_PREFIX$])
@@ -20984,7 +21064,7 @@ m4trace:configure.ac:141: -1- _AM_SUBST_NOTMAKE([ROSE_HAVE_LIBPQXX_FALSE])
 m4trace:configure.ac:141: -2- _m4_warn([obsolete], [The macro `AC_ERROR' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/oldnames.m4:34: AC_ERROR is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- AM_CONDITIONAL([ROSE_USE_TEST_SMT_SOLVER], [test ! "$TEST_SMT_SOLVER" = ""])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_USE_TEST_SMT_SOLVER_TRUE$])
@@ -20998,13 +21078,13 @@ You should run autoupdate.], [../../lib/autoconf/general.m4:207: AC_HELP_STRING 
 ../../lib/autoconf/general.m4:1492: AC_ARG_WITH is expanded from...
 config/support-capstone.m4:2: ROSE_SUPPORT_CAPSTONE is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- _m4_warn([obsolete], [The macro `AC_CHECKING' is obsolete.
 You should run autoupdate.], [../../lib/autoconf/general.m4:2277: AC_CHECKING is expanded from...
 config/support-capstone.m4:2: ROSE_SUPPORT_CAPSTONE is expanded from...
 config/support-binary.m4:32: ROSE_SUPPORT_BINARY is expanded from...
-config/support-rose.m4:1765: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
+config/support-rose.m4:1773: ROSE_SUPPORT_ROSE_PART_4 is expanded from...
 configure.ac:141: the top level])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_HAVE_CAPSTONE$])
 m4trace:configure.ac:141: -1- m4_pattern_allow([^ROSE_CAPSTONE_PREFIX$])

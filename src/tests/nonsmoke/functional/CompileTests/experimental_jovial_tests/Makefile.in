@@ -113,7 +113,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS) -ltinfo
+
+# DQ (10/23/2020): Pei-Hung and I think this may not be required (not available on my system).
+# I get the error: 
+#    /bin/ld: skipping incompatible /lib/libtinfo.so when searching for -ltinfo
+#    clang-10: error: linker command failed with exit code 1 (use -v to see invocation)
+# ROSE_LIBS += $(CLANG_LDFLAGS) -ltinfo
+@ROSE_USE_CLANG_FRONTEND_TRUE@am__append_1 = $(CLANG_LDFLAGS)
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@am__append_2 = -R $(DOT_ASIS_LIB_DIR_) 
 subdir = tests/nonsmoke/functional/CompileTests/experimental_jovial_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acmacros/canonicalize-symlink.m4 \
@@ -813,10 +820,10 @@ EDG_LIBS = @EDG_LIBS@
 
 # DQ (11/4/2016): Adding support for use of Address Sanitizer (for where the ROSE Test Handler (RTH) is used.
 # Note the quotes and escapes that are required:
-ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
+ADDRESS_SANITIZER_OPTIONS = "ASAN_OPTIONS=halt_on_error=0:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=\`which llvm-symbolizer\`"
 
 # DQ(11/4/2016): Need a version when not using the ROSE Test Handler (RTH):
-NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
+NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=halt_on_error=1:symbolize=1:detect_leaks=0 ASAN_SYMBOLIZER_PATH=`which llvm-symbolizer`
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_INCLUDES = @LIBELF_CPPFLAGS@
 @ROSE_HAVE_LIBELF_TRUE@ROSE_ELF_LIBS_WITH_PATH = @LIBELF_LDFLAGS@
 
@@ -924,8 +931,9 @@ NON_RTH_ADDRESS_SANITIZER_OPTIONS = ASAN_OPTIONS=symbolize=1:detect_leaks=0 ASAN
 # DQ (5/9/2017): Adding Ada library support.
 # ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
 @ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_INCLUDES = -I$(ada_path)/include_xxx
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS = -ldot_asis
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
+@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@DOT_ASIS_LIB_DIR_ = $(abs_top_builddir)/src/frontend/Experimental_Ada_ROSE_Connection/dot_asis/dot_asis_library/lib
+#  ROSE_ADA_LIBS = -ldot_asis
+#  ROSE_ADA_LIBS_WITH_PATH = $(DOT_ASIS_LIB_DIR_)/libdot_asis.so
 
 # RASMUSSEN (10/24/2017): Adding the GnuCOBOL parse-tree library support.
 @ROSE_EXPERIMENTAL_COBOL_ROSE_CONNECTION_TRUE@ROSE_COBOL_PT_LIBS_WITH_PATH = -L$(COBPT_LIBRARY_PATH) -lcob -lcobpt
@@ -1207,9 +1215,13 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 	$(ROSE_LIBMAGIC_LIBS_WITH_PATH) \
 	$(ROSE_READLINE_LIBS_WITH_PATH) $(ROSE_DLIB_LIBS_WITH_PATH) \
 	$(ROSE_GCRYPT_LIBS_WITH_PATH) $(ROSE_LIBPQXX_LIBS_WITH_PATH) \
-	$(ROSE_ADA_LIBS_WITH_PATH) $(ROSE_COBOL_PT_LIBS_WITH_PATH) \
-	$(ROSE_PYTHON_LIBS_WITH_PATH) $(ROSE_QUAD_FLOAT_MATH) \
-	$(ROSE_CAPSTONE_LIBS_WITH_PATH) $(am__append_1)
+	$(ROSE_COBOL_PT_LIBS_WITH_PATH) $(ROSE_PYTHON_LIBS_WITH_PATH) \
+	$(ROSE_QUAD_FLOAT_MATH) $(ROSE_CAPSTONE_LIBS_WITH_PATH) \
+	$(am__append_1)
+
+#if ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION
+#ROSE_LIBS += $(libroseAdalibraries) 
+#endif
 
 #========================================================================================================================
 # These are the "-R directory" switches that need to be passed to libtool running in link mode to make sure that ROSE
@@ -1244,27 +1256,16 @@ ROSE_LIBS = $(abspath $(top_builddir)/src/librose.la) -lm \
 # split the named environment variable into individual directory names.  If there's a ROSE configure option to specify
 # the library location, then DO NOT list an environment variable here--use the directory from configure instead (which
 # goes into ROSE_LIBS above).
-ROSE_RPATHS = \
-          $(patsubst -L%,-R %,                                                          \
-            $(filter-out -L/lib% -L/usr/lib% -L/usr/local/lib% -L/var/lib%,             \
-              $(filter -L%,                                                             \
-                $(ROSE_LIBS)                                                            \
-                $(subst :, , $(GNU_COMPILERS_LIBDIRS))                                  \
-                $(subst :, , $(LIBBZ2_LIBDIRS))                                         \
-                $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS))                              \
-                $(subst :, , $(LIBJPEG_LIBDIRS))                                        \
-                $(subst :, , $(LIBLCMS_LIBDIRS))                                        \
-                $(subst :, , $(LIBLZMA_LIBDIRS))                                        \
-                $(subst :, , $(LIBPNG_LIBDIRS))                                         \
-                $(subst :, , $(LIBTIFF_LIBDIRS))                                        \
-                $(subst :, , $(PYTHON_LIBDIRS))                                         \
-                $(subst :, , $(SPOT_LIBDIRS))                                           \
-                $(subst :, , $(ZLIB_LIBDIRS))                                           \
-                $(subst :, , $(INTEL_COMPILER_RPATHS))                                  \
-              )                                                                         \
-            )                                                                           \
-          )
-
+ROSE_RPATHS = $(patsubst -L%,-R %, $(filter-out -L/lib% -L/usr/lib% \
+	-L/usr/local/lib% -L/var/lib%, $(filter -L%, $(ROSE_LIBS) \
+	$(subst :, , $(GNU_COMPILERS_LIBDIRS)) $(subst :, , \
+	$(LIBBZ2_LIBDIRS)) $(subst :, , $(LIBGRAPHICSMAGICK_LIBDIRS)) \
+	$(subst :, , $(LIBJPEG_LIBDIRS)) $(subst :, , \
+	$(LIBLCMS_LIBDIRS)) $(subst :, , $(LIBLZMA_LIBDIRS)) $(subst \
+	:, , $(LIBPNG_LIBDIRS)) $(subst :, , $(LIBTIFF_LIBDIRS)) \
+	$(subst :, , $(PYTHON_LIBDIRS)) $(subst :, , $(SPOT_LIBDIRS)) \
+	$(subst :, , $(ZLIB_LIBDIRS)) $(subst :, , \
+	$(INTEL_COMPILER_RPATHS)) ) ) ) $(am__append_2)
 @OS_MACOSX_FALSE@ROSE_LINK_RPATHS = $(addprefix -Wl$(comma)-rpath , $(filter-out -R , $(ROSE_RPATHS)))
 
 # Rasmussen (3/23/2018): Added ROSE_LINK_RPATHS to enable linking on Mac OSX with ROSE installation
@@ -1331,6 +1332,7 @@ JOVIAL_TESTCODES = \
  1_2_3_main-program-module_c.jov        \
  1_2_3_main-program-module_d.jov        \
  2_1_1_4_bit_type.jov                   \
+ 2_1_1_6_status_item_b.jov              \
  2_1_1_7_pointer_type.jov               \
  2_1_2_simple_table_var.jov             \
  2_1_2_compound_table_var.jov           \
@@ -1341,6 +1343,7 @@ JOVIAL_TESTCODES = \
  2_1_3_constant_table_var.jov           \
  2_1_6_block_preset_list.jov            \
  2_4_define_j.jov                       \
+ 3_2_function_result.jov                \
  4_2_loop_stmt_b.jov                    \
  4_2_loop_stmt_b1.jov                   \
  4_2_loop_stmt_d.jov                    \
@@ -1362,8 +1365,12 @@ JOVIAL_TESTCODES = \
  4_10_abort_stmt_b.jov                  \
  5_2_logical_continuation_a.jov         \
  5_2_logical_continuation_b.jov         \
+ 5_2_logical_continuation_amb.jov       \
+ 6_1_byte_function_variable.jov         \
  6_1_ptr_dereference.jov                \
+ 6_1_table_dereference.jov              \
  6_3_user_def_function_call.jov         \
+ 6_3_4_byte_function.jov                \
  6_3_5_shift_function.jov               \
  6_3_6_abs_function.jov                 \
  6_3_10_nwdsen_function.jov             \
@@ -1377,10 +1384,95 @@ JOVIAL_TESTCODES = \
  rose-issue-rc-2.jov                    \
  rose-issue-rc-19.jov                   \
  rose-issue-rc-41a.jov                  \
+ rose-issue-rc-41b.jov                  \
  rose-issue-rc-42a.jov                  \
  rose-issue-rc-42b.jov                  \
+ rose-issue-rc-42c.jov                  \
  rose-issue-rc-69.jov                   \
- rose-issue-rc-85.jov
+ rose-issue-rc-84.jov                   \
+ rose-issue-rc-85.jov                   \
+ rose-issue-rc-86.jov                   \
+ rose-issue-rc-88.jov                   \
+ rose-issue-rc-91.jov                   \
+ rose-issue-rc-94.jov                   \
+ rose-issue-rc-96.jov                   \
+ rose-issue-rc-122-lcopy.jov            \
+ rose-issue-rc-133.jov                  \
+ rose-issue-rc-134.jov                  \
+ rose-issue-rc-135.jov                  \
+ rose-issue-rc-136.jov                  \
+ rose-issue-rc-136a.jov                 \
+ rose-issue-rc-137.jov                  \
+ rose-issue-rc-138.jov                  \
+ rose-issue-rc-139.jov                  \
+ rose-issue-rc-144a.jov                 \
+ rose-issue-rc-144b.jov                 \
+ rose-issue-rc-155.jov                  \
+ rose-issue-rc-156.jov                  \
+ rose-issue-rc-157.jov                  \
+ rose-issue-rc-158.jov                  \
+ rose-issue-rc-159.jov                  \
+ rose-issue-rc-160.jov                  \
+ rc161.pre.jov                          \
+ rose-issue-rc-179.jov                  \
+ rose-issue-rc-186.jov                  \
+ rose-issue-rc-189.jov                  \
+ rose-issue-rc-190.jov                  \
+ rose-issue-rc-191.jov                  \
+ rose-issue-rc-192.jov                  \
+ rose-issue-rc-193.jov                  \
+ rose-issue-rc-201.jov                  \
+ rose-issue-rc-201.pre.jov              \
+ rose-issue-rc-203.jov                  \
+ rose-issue-rc-203.pre.jov              \
+ rose-issue-rc-204.jov                  \
+ rose-issue-rc-225.jov                  \
+ rose-issue-rc-225.pre.jov              \
+ rose-issue-rc-227.jov                  \
+ rose-issue-rc-240.jov                  \
+ rose-issue-rc-241.jov                  \
+ rose-issue-rc-260.jov                  \
+ rose-issue-rc-271.jov                  \
+ rose-issue-rc-271.pre.jov              \
+ rose-issue-rc-290.jov                  \
+ rose-issue-rc-290.pre.jov              \
+ rose-issue-rc-291.jov                  \
+ rose-issue-rc-333.jov                  \
+ rose-issue-rc-333.pre.jov              \
+ rose-issue-rc-334.jov                  \
+ rose-issue-rc-334.pre.jov              \
+ rose-issue-rc-336.jov                  \
+ rose-issue-rc-336.pre.jov              \
+ rose-issue-rc-337.jov                  \
+ rose-issue-rc-337.pre.jov              \
+ rose-issue-rc-338.jov                  \
+ rose-issue-rc-338.pre.jov              \
+ rose-issue-rc-339.jov                  \
+ rose-issue-rc-341.jov                  \
+ rose-issue-rc-341.pre.jov              \
+ rose-issue-rc-360.jov                  \
+ rose-issue-rc-360.pre.jov              \
+ rose-issue-rc-383.jov                  \
+ rose-issue-rc-390.jov                  \
+ rose-issue-rc-390.pre.jov              \
+ rose-issue-rc-391.jov                  \
+ rose-issue-rc-391.pre.jov              \
+ rose-issue-rc-392.jov                  \
+ rose-issue-rc-392.pre.jov              \
+ rose-issue-rc-394.jov                  \
+ rose-issue-rc-394.pre.jov              \
+ rose-issue-rc-400.jov                  \
+ rose-issue-rc-400.pre.jov              \
+ rose-issue-rc-410.jov                  \
+ rose-issue-rc-410.pre.jov              \
+ rose-issue-rc-413.jov                  \
+ rose-issue-rc-413.pre.jov              \
+ rose-issue-rc-416.jov                  \
+ rose-issue-rc-416.pre.jov              \
+ rose-issue-rc-429.jov                  \
+ rose-issue-rc-429.pre.jov              \
+ rose-issue-rc-448.jov                  \
+ rose-issue-rc-448.pre.jov
 
 
 # status_enumval.jov                     \
@@ -1401,12 +1493,16 @@ JOVIAL_PARSER_TESTCODES = \
  6_3_2_next_function_pointer.jov        \
  6_3_2_next_function_status.jov
 
+
+#     rc161b.pre.cpl before rc161a.pre.cpl before rc161.jov
+#
 COMPOOL_TESTCODES = \
  define_dollar.cpl                      \
  simple_compool.cpl                     \
  status_type.cpl                        \
  2_4_define.cpl                         \
  3_0_rent_and_rec.cpl                   \
+ rc161b.pre.cpl                         \
  rose-issue-2143.cpl                    \
  rose-issue-2267.cpl                    \
  rose-issue-2654.cpl                    \
@@ -1434,13 +1530,29 @@ COMPOOL_TESTCODES = \
  rose-issue-rc-52.cpl                   \
  rose-issue-rc-53.cpl                   \
  rose-issue-rc-55.cpl                   \
+ rose-issue-rc-55a.cpl                  \
  rose-issue-rc-56.cpl                   \
  rose-issue-rc-79a.cpl                  \
- rose-issue-rc-87.cpl
+ rose-issue-rc-87.cpl                   \
+ rose-issue-rc-92a.cpl                  \
+ rose-issue-rc-93.cpl                   \
+ rose-issue-rc-95.cpl                   \
+ rose-issue-rc-118.cpl                  \
+ rose-issue-rc-119a.cpl                 \
+ rose-issue-rc-120.cpl                  \
+ rose-issue-rc-121.cpl                  \
+ rose-issue-rc-128.cpl                  \
+ rose-issue-rc-129.cpl                  \
+ rose-issue-rc-160a.cpl                 \
+ rc161a.pre.cpl                         \
+ rc410.cpl                              \
+ rc410.pre.cpl
 
 COMPOOL_DIRECTIVE_TESTCODES = \
  9_1_compool_directive.cpl              \
- rose-issue-rc-79b.cpl
+ rose-issue-rc-79b.cpl                  \
+ rose-issue-rc-92b.cpl                  \
+ rose-issue-rc-119b.cpl
 
 
 # proc_refs.cpl                          
@@ -1737,7 +1849,6 @@ uninstall-am:
 
 @ROSE_HAVE_LIBZ3_TRUE@  # The previous "Z3_*" variables should have been named "ROSE_Z3_*" following the pattern in the rest of this
 @ROSE_HAVE_LIBZ3_TRUE@  # makefile. I don't want to break code that uses the wrong names, so I'll just add the correct ones. [Matzke 2017-10-17]
-@ROSE_EXPERIMENTAL_ADA_ROSE_CONNECTION_TRUE@  DOT_ASIS_LIB_DIR_ ?= /home/quinlan1/ROSE/ADA/dot_asis/dot_asis_library/lib
 
 show-rpaths:
 	@echo "ROSE_LIBS = $(ROSE_LIBS)"
