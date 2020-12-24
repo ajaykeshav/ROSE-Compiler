@@ -1,0 +1,8 @@
+START
+PROGRAM testloop ;
+BEGIN
+  ITEM ivar U = 0;
+  WHILE ivar<10;
+    ivar=ivar+1;
+END
+TERM
